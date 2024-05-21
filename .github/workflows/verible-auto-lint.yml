@@ -13,7 +13,6 @@ jobs:
         exclude_paths: |
           ./doc
         extra_args: "--check_syntax=true"
-        verible_version: "v0.0-3100-gd75b1c47"
         extensions: |
           .sv
           .v
