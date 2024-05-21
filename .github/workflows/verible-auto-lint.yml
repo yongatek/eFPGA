@@ -1,0 +1,12 @@
+name: Verible linter test
+on:
+  pull_request:
+  check_run:
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - uses: chipsalliance/verible-linter-action@main
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
