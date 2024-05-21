@@ -1,6 +1,6 @@
 name: Verible linter test
 on:
-  pull_request:
+  pull_request_target:
   check_run:
 jobs:
   lint:
@@ -9,4 +9,14 @@ jobs:
     - uses: actions/checkout@master
     - uses: chipsalliance/verible-linter-action@main
       with:
+        config_file: 'config.rules'
+        exclude_paths: |
+          ./doc
+        extra_args: "--check_syntax=true"
+        verible_version: "v0.0-3100-gd75b1c47"
+        extensions: |
+          .sv
+          .v
+          .vh
+          .svh
         github_token: ${{ secrets.GITHUB_TOKEN }}
