@@ -1,6 +1,7 @@
 name: Verible linter test
 on:
   pull_request:
+  check_run:
 jobs:
   lint:
     runs-on: ubuntu-latest
