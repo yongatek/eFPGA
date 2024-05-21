@@ -9,7 +9,6 @@ jobs:
     - uses: actions/checkout@master
     - uses: chipsalliance/verible-linter-action@main
       with:
-        config_file: 'config.rules'
         exclude_paths: |
           ./doc
         extra_args: "--check_syntax=true"
