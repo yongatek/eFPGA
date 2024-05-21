@@ -1,4 +1,4 @@
-name: Verible linter example
+name: Verible linter test
 on:
   pull_request:
 jobs:
