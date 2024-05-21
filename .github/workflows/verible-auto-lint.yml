@@ -1,16 +1,19 @@
 name: Verible linter test
+
 on:
   pull_request_target:
+    types: [opened, synchronize, reopened]
   check_run:
+    types: [created, rerequested, completed]
+
 jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@master
+    - uses: actions/checkout@v2
     - uses: chipsalliance/verible-linter-action@main
       with:
-        exclude_paths: |
-          ./doc
+        exclude_paths: ./doc
         extra_args: "--check_syntax=true"
         extensions: |
           .sv
