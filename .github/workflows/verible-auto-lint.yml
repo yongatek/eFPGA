@@ -1,23 +1,11 @@
-name: Verible linter test
-
+name: Verible linter example
 on:
-  pull_request_target:
-    types: [opened, synchronize, reopened]
-  check_run:
-    types: [created, rerequested, completed]
-
+  pull_request:
 jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@master
     - uses: chipsalliance/verible-linter-action@main
       with:
-        exclude_paths: ./doc
-        extra_args: "--check_syntax=true"
-        extensions: |
-          .sv
-          .v
-          .vh
-          .svh
         github_token: ${{ secrets.GITHUB_TOKEN }}
