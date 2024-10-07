@@ -46,9 +46,9 @@ TBD
 | WI3.4.5-8-3    | Memory blocks shall have single-port SRAM macros.                                                                  | Mandatory   | Functional       | ✓              |
 | WI3.4.5-8-4    | Memory blocks shall support write-first policy.                                                                    | Mandatory   | Functional       | X              |
 | WI3.4.5-8-5    | Memory blocks shall support synchronous read.                                                                      | Mandatory   | Functional       | ✓              |
-| WI3.4.5-9      | DSP tiles shall include MAC blocks.                                                                                | Optional    | Functional       | X              |
-| WI3.4.5-9-1    | MAC blocks shall have two 18-bit inputs and output 36-bit output.                                                  | Optional    | Functional       | X              |
-| WI3.4.5-9-2    | Number of total DSP tiles shall be 8.                                                                              | Optional    | Functional       | X              |
+| WI3.4.5-9      | DSP tiles shall include MAC blocks.                                                                                | Optional    | Functional       | ✓              |
+| WI3.4.5-9-1    | MAC blocks shall have two 18-bit inputs and output 36-bit output.                                                  | Optional    | Functional       | ✓              |
+| WI3.4.5-9-2    | Number of total DSP tiles shall be 8.                                                                              | Optional    | Functional       | ✓              |
 | WI3.4.5-10     | eFPGA IP shall have a configuration logic to program the FPGA fabric.                                              | Mandatory   | Functional       | ✓              |
 | WI3.4.5-10-1   | Each tile shall have configuration circuitry to define the interconnection and wiring in tile components.          | Mandatory   | Functional       | ✓              |
 | WI3.4.5-10-2   | Switch blocks shall provide the interconnect between the tiles.                                                    | Mandatory   | Functional       | ✓              |
