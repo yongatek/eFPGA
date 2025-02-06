@@ -1,0 +1,794 @@
+<?xml version="1.0"?>
+<architecture>
+  <models>
+    <model name="adder">
+      <input_ports>
+        <port name="a" combinational_sink_ports="sumout cout"/>
+        <port name="b" combinational_sink_ports="sumout cout"/>
+        <port name="cin" combinational_sink_ports="sumout cout"/>
+      </input_ports>
+      <output_ports>
+        <port name="cout"/>
+        <port name="sumout"/>
+      </output_ports>
+    </model>
+    <model name="dual_port_ram">
+      <input_ports>
+        <port name="addr1" clock="clk"/>
+        <port name="d_in1" clock="clk"/>
+        <port name="wen1" clock="clk"/>
+        <port name="addr2" clock="clk"/>
+        <port name="d_in2" clock="clk"/>
+        <port name="wen2" clock="clk"/>
+        <port name="clk" is_clock="1"/>
+      </input_ports>
+      <output_ports>
+        <port name="d_out1" clock="clk"/>
+        <port name="d_out2" clock="clk"/>
+      </output_ports>
+   </model>
+    <model name="mult_8">
+      <input_ports>
+      	<port name="sign" combinational_sink_ports="Y"/>
+        <port name="A" combinational_sink_ports="Y"/>
+        <port name="B" combinational_sink_ports="Y"/>
+      </input_ports>
+      <output_ports>
+        <port name="Y"/>
+      </output_ports>
+    </model>
+    <model name="io">
+      <input_ports>
+        <port name="outpad"/>
+      </input_ports>
+      <output_ports>
+        <port name="inpad"/>
+      </output_ports>
+    </model>
+    <model name="frac_lut4">
+      <input_ports>
+        <port name="in"/>
+      </input_ports>
+      <output_ports>
+        <port name="lut3_out"/>
+        <port name="lut4_out"/>
+      </output_ports>
+    </model>
+    <model name="DFFRQ">
+      <input_ports>
+        <port name="D" clock="clk"/>
+        <port name="reset" clock="clk"/>
+        <port name="clk" is_clock="1"/>
+      </input_ports>
+      <output_ports>
+        <port name="Q" clock="clk"/>
+      </output_ports>
+    </model>
+  </models>
+  <tiles>
+    <tile name="io_top" area="0">
+      <sub_tile name="io_top" capacity="8">
+        <equivalent_sites>
+          <site pb_type="io"/>
+        </equivalent_sites>
+        <input name="outpad" num_pins="1"/>
+        <output name="inpad" num_pins="1"/>
+        <fc in_type="frac" in_val="0.15" out_type="frac" out_val="0.10"/>
+        <pinlocations pattern="custom">
+          <loc side="bottom">io_top.outpad io_top.inpad</loc>
+        </pinlocations>
+      </sub_tile>
+    </tile>
+    <tile name="io_right" area="0">
+      <sub_tile name="io_right" capacity="8">
+        <equivalent_sites>
+          <site pb_type="io"/>
+        </equivalent_sites>
+        <input name="outpad" num_pins="1"/>
+        <output name="inpad" num_pins="1"/>
+        <fc in_type="frac" in_val="0.15" out_type="frac" out_val="0.10"/>
+        <pinlocations pattern="custom">
+          <loc side="left">io_right.outpad io_right.inpad</loc>
+        </pinlocations>
+      </sub_tile>
+    </tile>
+    <tile name="io_bottom" area="0">
+      <sub_tile name="io_bottom" capacity="2">
+        <equivalent_sites>
+          <site pb_type="io"/>
+        </equivalent_sites>
+        <input name="outpad" num_pins="1"/>
+        <output name="inpad" num_pins="1"/>
+        <fc in_type="frac" in_val="0.15" out_type="frac" out_val="0.10"/>
+        <pinlocations pattern="custom">
+          <loc side="top">io_bottom.outpad io_bottom.inpad</loc>
+        </pinlocations>
+      </sub_tile>
+    </tile>
+    
+    <tile name="io_bottom_empty_1" area="0">
+      <sub_tile name="io_bottom" capacity="1">
+        <equivalent_sites>
+          <site pb_type="io"/>
+        </equivalent_sites>
+        <input name="outpad" num_pins="1"/>
+        <output name="inpad" num_pins="1"/>
+        <fc in_type="frac" in_val="0.15" out_type="frac" out_val="0.10"/>
+        <pinlocations pattern="custom">
+          <loc side="top">io_bottom.outpad io_bottom.inpad</loc>
+        </pinlocations>
+      </sub_tile>
+    </tile>
+    <tile name="io_bottom_empty_2" area="0">
+      <sub_tile name="io_bottom" capacity="2">
+        <equivalent_sites>
+          <site pb_type="io"/>
+        </equivalent_sites>
+        <input name="outpad" num_pins="1"/>
+        <output name="inpad" num_pins="1"/>
+        <fc in_type="frac" in_val="0.15" out_type="frac" out_val="0.10"/>
+        <pinlocations pattern="custom">
+          <loc side="top">io_bottom.outpad io_bottom.inpad</loc>
+        </pinlocations>
+      </sub_tile>
+    </tile>
+    <tile name="io_left" area="0">
+      <sub_tile name="io_left" capacity="1">
+        <equivalent_sites>
+          <site pb_type="io"/>
+        </equivalent_sites>
+        <input name="outpad" num_pins="1"/>
+        <output name="inpad" num_pins="1"/>
+        <fc in_type="frac" in_val="0.15" out_type="frac" out_val="0.10"/>
+        <pinlocations pattern="custom">
+          <loc side="right">io_left.outpad io_left.inpad</loc>
+        </pinlocations>
+      </sub_tile>
+    </tile>
+    <tile name="memory" height="1" width="2" area="548000">
+      <sub_tile name="memory">
+        <equivalent_sites>
+          <site pb_type="memory"/>
+        </equivalent_sites>
+        <input name="addr1" num_pins="10"/>
+        <input name="addr2" num_pins="10"/>
+        <input name="d_in1" num_pins="8"/>
+        <input name="d_in2" num_pins="8"/>
+        <input name="wen1" num_pins="1"/>
+        <input name="wen2" num_pins="1"/>
+        <output name="d_out1" num_pins="8"/>
+        <output name="d_out2" num_pins="8"/>
+        <clock name="clk" num_pins="1"/>
+        <fc in_type="frac" in_val="0.15" out_type="frac" out_val="0.10">
+          <fc_override port_name="clk" fc_type="frac" fc_val="0"/>
+        </fc>
+        <pinlocations pattern="custom">
+          <loc side="left">  </loc>
+          <loc side="top"> </loc>
+          <loc side="right"> </loc>
+          <loc side="bottom"> memory.clk[0:0]  memory.wen1  memory.wen2  memory.d_out1[0:7] memory.d_in2[0:7] memory.addr2[0:9]  memory.d_in1[0:7] memory.addr1[0:9]  memory.d_out2[0:7]</loc>
+        </pinlocations>
+      </sub_tile>
+    </tile>
+    <tile name="clb" area="53894">
+      <sub_tile name="clb">
+        <equivalent_sites>
+          <site pb_type="clb"/>
+        </equivalent_sites>
+        <input name="I" num_pins="32" equivalent="none"/>
+        <input name="cin" num_pins="1"/>
+        <input name="reset" num_pins="1" is_non_clock_global="true"/>
+        <output name="O" num_pins="16" equivalent="none"/>
+        <output name="cout" num_pins="1"/>
+        <clock name="clk" num_pins="1"/>
+        <fc in_type="frac" in_val="0.15" out_type="frac" out_val="0.10">
+          <fc_override port_name="cin" fc_type="frac" fc_val="0"/>
+          <fc_override port_name="cout" fc_type="frac" fc_val="0"/>
+          <fc_override port_name="clk" fc_type="frac" fc_val="0"/>
+          <fc_override port_name="reset" fc_type="frac" fc_val="0"/>
+        </fc>
+        <pinlocations pattern="custom">
+          <loc side="left"></loc>
+          <loc side="top"> </loc>
+          <loc side="right"></loc>
+          <loc side="bottom">clb.clk[0:0] clb.reset clb.cin clb.O[0:5] clb.I clb.O[6:9]  clb.cout clb.O[10:15]</loc>
+        </pinlocations>
+      </sub_tile>
+    </tile>
+    <tile name="mult_8" height="1" width="1" area="396000">
+      <sub_tile name="mult_8">
+        <equivalent_sites>
+          <site pb_type="mult_8" pin_mapping="direct"/>
+        </equivalent_sites>
+        <input name="sign" num_pins="1"/>
+        <input name="a" num_pins="8"/>
+        <input name="b" num_pins="8"/>
+        <output name="out" num_pins="16"/>
+        <fc in_type="frac" in_val="0.15" out_type="frac" out_val="0.10"/>
+        <pinlocations pattern="custom">
+          <loc side="left"> </loc>
+          <loc side="top"> </loc>
+          <loc side="right">   </loc>
+          <loc side="bottom"> mult_8.sign[0:0] mult_8.a[0:7]  mult_8.b[0:7] mult_8.out[0:15] </loc>
+        </pinlocations>
+      </sub_tile>
+    </tile>
+  </tiles>
+  <layout tileable="true" through_channel="true" shrink_boundary="true">
+    <auto_layout aspect_ratio="1.0">
+      <row type="io_top" starty="H-1" priority="100"/>
+      <row type="io_bottom" starty="0" priority="100"/>
+      <col type="io_left" startx="0" priority="100"/>
+      <col type="io_right" startx="W-1" priority="100"/>
+      <corners type="EMPTY" priority="101"/>
+      <fill type="clb" priority="10"/>
+      <col type="mult_8" startx="2" starty="1" repeatx="8" priority="20"/>
+    </auto_layout>
+
+    <fixed_layout name="8x8" width="8" height="8">
+      <row type="io_top" starty="H-1" priority="100"/>
+      <row type="io_bottom" starty="0" priority="100"/>
+      <col type="io_left" startx="0" priority="100"/>
+      <col type="io_right" startx="W-1" priority="100"/>
+      <corners type="EMPTY" priority="101"/>
+      <fill type="clb" priority="10"/>
+      <col type="mult_8" startx="2" starty="1" priority="20"/>
+      <col type="memory" startx="5" starty="1" priority="20"/>
+    </fixed_layout>
+
+    <fixed_layout name="10x10" width="10" height="10">
+      <row type="io_top" starty="H-1" priority="100"/>
+      <row type="io_bottom" starty="0" priority="100"/>
+      <col type="io_left" startx="0" priority="100"/>
+      <col type="io_right" startx="W-1" priority="100"/>
+      <corners type="EMPTY" priority="101"/>
+      <fill type="clb" priority="10"/>
+      <col type="mult_8" startx="2" starty="1" priority="20"/>
+      <col type="memory" startx="7" starty="1" priority="20"/>
+    </fixed_layout>
+
+    <fixed_layout name="12x12" width="12" height="12">
+      <row type="io_top" starty="H-1" priority="100"/>
+      <row type="io_bottom" starty="0" priority="100"/>
+      <col type="io_left" startx="0" priority="100"/>
+      <col type="io_right" startx="W-1" priority="100"/>
+      <corners type="EMPTY" priority="101"/>
+      <fill type="clb" priority="10"/>
+      <col type="mult_8" startx="9" starty="1" priority="20"/>
+      <col type="mult_8" startx="2" starty="1" priority="20"/>
+      <col type="memory" startx="4" starty="1" priority="20"/>
+      <col type="memory" startx="7" starty="1" priority="20"/>
+    </fixed_layout>
+    <fixed_layout name="10x18" width="20" height="12">
+      <row type="io_top" starty="H-1" priority="100"/>
+      <row type="io_bottom" starty="0" priority="100"/>
+      <col type="io_left" startx="0" priority="100"/>
+      <col type="io_right" startx="W-1" priority="100"/>
+      <corners type="EMPTY" priority="101"/>
+      <fill type="clb" priority="10"/>
+      <col type="mult_8" startx="5" starty="1" priority="20"/>
+      <col type="memory" startx="12" starty="1" priority="20"/>
+    </fixed_layout>
+    <fixed_layout name="18x10" width="20" height="12">
+      <row type="io_top" starty="H-1" priority="100"/>
+      <row type="io_bottom" starty="0" priority="100"/>
+      <col type="io_left" startx="0" priority="100"/>
+      <col type="io_right" startx="W-1" priority="100"/>
+      <corners type="EMPTY" priority="101"/>
+      <fill type="clb" priority="10"/>
+      <row type="mult_8" starty="3" startx="1" priority="20"/>
+      <row type="memory" starty="8" startx="1" priority="20"/>
+    </fixed_layout>
+    <fixed_layout name="18x18" width="18" height="18">
+      <row type="io_top" starty="H-1" priority="100"/>
+      <row type="io_bottom" starty="0" priority="100"/>
+      <col type="io_left" startx="0" priority="100"/>
+      <col type="io_right" startx="W-1" priority="100"/>
+      <corners type="EMPTY" priority="101"/>
+      <fill type="clb" priority="10"/>
+      <col type="mult_8" startx="5" starty="1" priority="20"/>
+      <col type="memory" startx="12" starty="1" priority="20"/>
+    </fixed_layout>
+	
+    <fixed_layout name="20x20" width="20" height="20">
+      <corners type="EMPTY" priority="101"/>
+      <row type="EMPTY" starty="H-1" priority="100"/>
+      <col type="EMPTY" startx="0" priority="100"/>
+      <col type="io_right" startx="W-1" priority="100"/>
+      <col type="clb" startx="W-2" priority="90"/>
+      <row type="EMPTY" starty="0" priority="100"/>
+      <fill type="clb" priority="10"/>
+      <row type="mult_8" starty="10" startx="1" priority="20"/>
+      <row type="memory" starty="5" startx="1" priority="20"/>
+      <row type="memory" starty="15" startx="1" priority="20"/>
+    </fixed_layout>
+
+    <fixed_layout name="108x108" width="108" height="108">
+      <corners type="EMPTY" priority="101"/>
+      <row type="EMPTY" starty="H-1" priority="100"/>
+      <col type="EMPTY" startx="0" priority="100"/>
+      <col type="io_right" startx="W-1" priority="100"/>
+      <col type="clb" startx="W-2" priority="100"/>
+      <row type="EMPTY" starty="0" priority="100"/>
+      <fill type="clb" priority="10"/>
+      <row type="mult_8" starty="10" startx="1" priority="20"/>
+      <row type="mult_8" starty="32" startx="1" priority="20"/>  
+      <row type="memory" starty="21" startx="1" priority="20"/>           
+      <row type="memory" starty="43" startx="1" priority="20"/>
+      <row type="mult_8" starty="75" startx="1" priority="20"/>
+      <row type="mult_8" starty="97" startx="1" priority="20"/>  
+      <row type="memory" starty="64" startx="1" priority="20"/>           
+      <row type="memory" starty="86" startx="1" priority="20"/>
+    </fixed_layout>
+  </layout>
+  <device>
+    <sizing R_minW_nmos="8926" R_minW_pmos="16067"/>
+    <area grid_logic_tile_area="0"/>
+    <chan_width_distr>
+      <x distr="uniform" peak="1.000000"/>
+      <y distr="uniform" peak="1.000000"/>
+    </chan_width_distr>
+    <switch_block type="wilton" fs="3" sub_type="subset" sub_fs="3"/>
+    <connection_block input_switch_name="ipin_cblock"/>
+  </device>
+  <switchlist>
+    <switch type="mux" name="L1_mux" R="551" Cin=".77e-15" Cout="4e-15" Tdel="${L1_SB_MUX_DELAY}" mux_trans_size="2.630740" buf_size="27.645901"/> 
+    <switch type="mux" name="L2_mux" R="551" Cin=".77e-15" Cout="4e-15" Tdel="${L2_SB_MUX_DELAY}" mux_trans_size="2.630740" buf_size="27.645901"/> 
+    <switch type="mux" name="L4_mux" R="551" Cin=".77e-15" Cout="4e-15" Tdel="${L4_SB_MUX_DELAY}" mux_trans_size="2.630740" buf_size="27.645901"/> 
+    <switch type="mux" name="L8_mux" R="551" Cin=".77e-15" Cout="4e-15" Tdel="${L8_SB_MUX_DELAY}" mux_trans_size="2.630740" buf_size="27.645901"/> 
+    <switch type="mux" name="ipin_cblock" R="2231.5" Cout="0." Cin="1.47e-15" Tdel="${CB_MUX_DELAY}" mux_trans_size="1.222260" buf_size="auto"/>
+  </switchlist>
+  <segmentlist>
+    <segment name="L1" freq="0.05" length="1" type="unidir" Rmetal="101" Cmetal="22.5e-15">
+      <mux name="L1_mux"/>
+      <sb type="pattern">1 1</sb>
+      <cb type="pattern">1</cb>
+    </segment>
+    <segment name="L2" freq="0.85" length="2" type="unidir" Rmetal="101" Cmetal="22.5e-15">
+      <mux name="L2_mux"/>
+      <sb type="pattern">1 1 1</sb>
+      <cb type="pattern">1 1</cb>
+    </segment>
+    <segment name="L4" freq="0.05" length="4" type="unidir" Rmetal="101" Cmetal="22.5e-15">
+      <mux name="L4_mux"/>
+      <sb type="pattern">1 1 1 1 1</sb>
+      <cb type="pattern">1 1 1 1</cb>
+    </segment>
+    <segment name="L8" freq="0.05" length="8" type="unidir" Rmetal="101" Cmetal="22.5e-15">
+      <mux name="L8_mux"/>
+      <sb type="pattern">1 1 1 1 1 1 1 1 1 </sb>
+      <cb type="pattern">1 1 1 1 1 1 1 1 </cb>
+    </segment>
+  </segmentlist>
+  <directlist>
+    <direct name="adder_carry" from_pin="clb.cout" to_pin="clb.cin" x_offset="0" y_offset="-1" z_offset="0"/>
+  </directlist>
+  <complexblocklist>
+    <pb_type name="io">
+      <input name="outpad" num_pins="1"/>
+      <output name="inpad" num_pins="1"/>
+      <mode name="physical" disable_packing="true">
+        <pb_type name="iopad" blif_model=".subckt io" num_pb="1">
+          <input name="outpad" num_pins="1"/>
+          <output name="inpad" num_pins="1"/>
+        </pb_type>
+        <interconnect>
+          <direct name="outpad" input="io.outpad" output="iopad.outpad">
+            <delay_constant max="${OUTPAD_DELAY}" in_port="io.outpad" out_port="iopad.outpad"/> <!--to do-->
+          </direct>
+          <direct name="inpad" input="iopad.inpad" output="io.inpad">
+            <delay_constant max="${INPAD_DELAY}" in_port="iopad.inpad" out_port="io.inpad"/> <!--to do-->
+          </direct>
+        </interconnect>
+      </mode>
+      <mode name="inpad">
+        <pb_type name="inpad" blif_model=".input" num_pb="1">
+          <output name="inpad" num_pins="1"/>
+        </pb_type>
+        <interconnect>
+          <direct name="inpad" input="inpad.inpad" output="io.inpad">
+            <delay_constant max="${INPAD_DELAY}" in_port="inpad.inpad" out_port="io.inpad"/> <!--to do-->
+          </direct>
+        </interconnect>
+      </mode>
+      <mode name="outpad">
+        <pb_type name="outpad" blif_model=".output" num_pb="1">
+          <input name="outpad" num_pins="1"/>
+        </pb_type>
+        <interconnect>
+          <direct name="outpad" input="io.outpad" output="outpad.outpad">
+            <delay_constant max="${OUTPAD_DELAY}" in_port="io.outpad" out_port="outpad.outpad"/> <!--to do-->
+          </direct>
+        </interconnect>
+      </mode>
+      <power method="ignore"/>
+    </pb_type>
+    <pb_type name="clb">
+      <input name="I" num_pins="32" equivalent="none"/>
+      <input name="cin" num_pins="1"/>
+      <input name="reset" num_pins="1" is_non_clock_global="true"/>
+      <output name="O" num_pins="16" equivalent="none"/>
+      <output name="cout" num_pins="1"/>
+      <clock name="clk" num_pins="1"/>
+      <pb_type name="fle" num_pb="8">
+        <input name="in" num_pins="4"/>
+        <input name="cin" num_pins="1"/>
+        <input name="reset" num_pins="1"/>
+        <output name="out" num_pins="2"/>
+        <output name="cout" num_pins="1"/>
+        <clock name="clk" num_pins="1"/>
+        <mode name="physical" disable_packing="true">
+          <pb_type name="fabric" num_pb="1">
+            <input name="in" num_pins="4"/>
+            <input name="cin" num_pins="1"/>
+            <output name="out" num_pins="2"/>
+            <output name="cout" num_pins="1"/>
+            <clock name="clk" num_pins="1"/>
+            <clock name="reset" num_pins="1"/>
+            <pb_type name="frac_logic" num_pb="1">
+              <input name="in" num_pins="4"/>
+              <output name="out" num_pins="2"/>
+              <pb_type name="frac_lut4" blif_model=".subckt frac_lut4" num_pb="1">
+                <input name="in" num_pins="4"/>
+                <output name="lut3_out" num_pins="2"/>
+                <output name="lut4_out" num_pins="1"/>
+              </pb_type>
+              <interconnect>
+                <direct name="direct1" input="frac_logic.in" output="frac_lut4.in"/>
+                <direct name="direct2" input="frac_lut4.lut3_out[1]" output="frac_logic.out[1]"/>
+                <!-- Xifan Tang: I use out[0] because the output of lut6 in lut6 mode is wired to the out[0] -->
+                <mux name="mux1" input="frac_lut4.lut4_out frac_lut4.lut3_out[0]" output="frac_logic.out[0]"/>
+              </interconnect>
+            </pb_type>
+            <!-- Define flip-flop -->
+            <pb_type name="ff" blif_model=".subckt DFFRQ" num_pb="2">
+              <input name="D" num_pins="1"/>
+              <input name="reset" num_pins="1"/>
+              <output name="Q" num_pins="1"/>
+              <clock name="clk" num_pins="1"/>
+              <T_setup value="${FF_T_SETUP}" port="ff.D" clock="clk"/>
+              <T_setup value="${FF_T_SETUP}" port="ff.reset" clock="clk"/>
+              <T_clock_to_Q max="${FF_T_CLK2Q}" port="ff.Q" clock="clk"/>
+            </pb_type>
+            <pb_type name="adder" blif_model=".subckt adder" num_pb="1">
+              <input name="a" num_pins="1"/>
+              <input name="b" num_pins="1"/>
+              <input name="cin" num_pins="1"/>
+              <output name="cout" num_pins="1"/>
+              <output name="sumout" num_pins="1"/>
+              <delay_constant max="${FA_DELAY}" in_port="adder.a" out_port="adder.sumout"/>
+              <delay_constant max="${FA_DELAY}" in_port="adder.b" out_port="adder.sumout"/>
+              <delay_constant max="${FA_DELAY}" in_port="adder.cin" out_port="adder.sumout"/>
+              <delay_constant max="${FA_DELAY}" in_port="adder.a" out_port="adder.cout"/>
+              <delay_constant max="${FA_DELAY}" in_port="adder.b" out_port="adder.cout"/>
+              <delay_constant max="${FA_DELAY}" in_port="adder.cin" out_port="adder.cout"/>
+            </pb_type>
+            <interconnect>
+              <direct name="direct1" input="fabric.in" output="frac_logic.in"/>
+              <direct name="direct2" input="fabric.cin" output="adder[0:0].cin"/>
+              <direct name="direct3" input="adder[0:0].cout" output="fabric.cout"/>
+              <direct name="direct4" input="frac_logic.out[0:0]" output="adder[0:0].a"/>
+              <direct name="direct5" input="frac_logic.out[1:1]" output="adder[0:0].b"/>
+              <complete name="direct6" input="fabric.clk" output="ff[1:0].clk"/>
+              <complete name="direct7" input="fabric.reset" output="ff[1:0].reset"/>
+              <mux name="mux1" input="frac_logic.out[0:0] adder[0].cout" output="ff[0:0].D">
+                <delay_constant max="${FLE_MUX}" in_port="frac_logic.out[0:0]" out_port="ff[0:0].D"/>
+                <delay_constant max="${FLE_MUX}" in_port="adder[0].cout" out_port="ff[0:0].D"/>
+              </mux>
+              <mux name="mux2" input="frac_logic.out[1:1] adder[0].sumout" output="ff[1:1].D">
+                <delay_constant max="${FLE_MUX}" in_port="frac_logic.out[1:1]" out_port="ff[1:1].D"/>
+                <delay_constant max="${FLE_MUX}" in_port="adder[0].sumout" out_port="ff[1:1].D"/>
+              </mux>
+              <mux name="mux3" input="adder[0].cout ff[0].Q frac_logic.out[0]" output="fabric.out[0]">
+                <delay_constant max="${FLE_MUX}" in_port="adder[0].cout frac_logic.out[0]" out_port="fabric.out[0]"/>
+                <delay_constant max="${FLE_MUX}" in_port="ff[0].Q" out_port="fabric.out[0]"/>
+              </mux>
+              <mux name="mux4" input="adder[0].sumout ff[1].Q frac_logic.out[1]" output="fabric.out[1]">
+                <delay_constant max="${FLE_MUX}" in_port="adder[0].sumout frac_logic.out[1]" out_port="fabric.out[1]"/>
+                <delay_constant max="${FLE_MUX}" in_port="ff[1].Q" out_port="fabric.out[1]"/>
+              </mux>
+            </interconnect>
+          </pb_type>
+          <interconnect>
+            <direct name="direct1" input="fle.in" output="fabric.in"/>
+            <direct name="direct2" input="fle.cin" output="fabric.cin"/>
+            <direct name="direct3" input="fabric.out" output="fle.out"/>
+            <direct name="direct4" input="fabric.cout" output="fle.cout"/>
+            <direct name="direct5" input="fle.clk" output="fabric.clk"/>
+            <direct name="direct6" input="fle.reset" output="fabric.reset"/>
+          </interconnect>
+        </mode>
+        <mode name="n2_lut3">
+          <pb_type name="lut3inter" num_pb="1">
+            <input name="in" num_pins="3"/>
+            <output name="out" num_pins="2"/>
+            <clock name="clk" num_pins="1"/>
+            <pb_type name="ble3" num_pb="2">
+              <input name="in" num_pins="3"/>
+              <output name="out" num_pins="1"/>
+              <clock name="clk" num_pins="1"/>
+              <pb_type name="lut3" blif_model=".names" num_pb="1" class="lut">
+                <input name="in" num_pins="3" port_class="lut_in"/>
+                <output name="out" num_pins="1" port_class="lut_out"/>
+                <delay_matrix type="max" in_port="lut3.in" out_port="lut3.out">
+                  ${LUT3_DELAY_MATRIX}
+                  ${LUT3_DELAY_MATRIX}
+                  ${LUT3_DELAY_MATRIX}
+                </delay_matrix>
+              </pb_type>
+              <!-- Define the flip-flop -->
+              <pb_type name="ff" blif_model=".latch" num_pb="1" class="flipflop">
+                <input name="D" num_pins="1" port_class="D"/>
+                <output name="Q" num_pins="1" port_class="Q"/>
+                <clock name="clk" num_pins="1" port_class="clock"/>
+                <T_setup value="${FF_T_SETUP}" port="ff.D" clock="clk"/>
+                <T_clock_to_Q max="${FF_T_CLK2Q}" port="ff.Q" clock="clk"/>
+              </pb_type>
+              <interconnect>
+                <direct name="direct1" input="ble3.in[2:0]" output="lut3[0:0].in[2:0]"/>
+                <direct name="direct2" input="lut3[0:0].out" output="ff[0:0].D">
+                  <!-- Advanced user option that tells CAD tool to find LUT+FF pairs in netlist -->
+                  <pack_pattern name="ble3" in_port="lut3[0:0].out" out_port="ff[0:0].D"/>
+                </direct>
+                <direct name="direct3" input="ble3.clk" output="ff[0:0].clk"/>
+                <mux name="mux1" input="ff[0:0].Q lut3.out[0:0]" output="ble3.out[0:0]">
+                  <!-- LUT to output is faster than FF to output on a Stratix IV -->
+                  <delay_constant max="${FLE_MUX}" in_port="lut3.out[0:0]" out_port="ble3.out[0:0]"/>
+                  <delay_constant max="${FLE_MUX}" in_port="ff[0:0].Q" out_port="ble3.out[0:0]"/>
+                </mux>
+              </interconnect>
+            </pb_type>
+            <interconnect>
+              <direct name="direct1" input="lut3inter.in" output="ble3[0:0].in"/>
+              <direct name="direct2" input="lut3inter.in" output="ble3[1:1].in"/>
+              <direct name="direct3" input="ble3[1:0].out" output="lut3inter.out"/>
+              <complete name="complete1" input="lut3inter.clk" output="ble3[1:0].clk"/>
+            </interconnect>
+          </pb_type>
+          <interconnect>
+            <direct name="direct1" input="fle.in[2:0]" output="lut3inter.in"/>
+            <direct name="direct2" input="lut3inter.out" output="fle.out"/>
+            <direct name="direct3" input="fle.clk" output="lut3inter.clk"/>
+          </interconnect>
+        </mode>
+        <mode name="arithmetic">
+          <pb_type name="arithmetic" num_pb="1">
+            <input name="in" num_pins="3"/>
+            <input name="cin" num_pins="1"/>
+            <output name="out" num_pins="2"/>
+            <output name="cout" num_pins="1"/>
+            <clock name="clk" num_pins="1"/>
+            <pb_type name="lut3" blif_model=".names" num_pb="2" class="lut">
+              <input name="in" num_pins="3" port_class="lut_in"/>
+              <output name="out" num_pins="1" port_class="lut_out"/>
+              <delay_matrix type="max" in_port="lut3.in" out_port="lut3.out">
+                  ${LUT3_DELAY_MATRIX}
+                  ${LUT3_DELAY_MATRIX}
+                  ${LUT3_DELAY_MATRIX}
+                </delay_matrix>
+            </pb_type>
+            <pb_type name="adder" blif_model=".subckt adder" num_pb="1">
+              <input name="a" num_pins="1"/>
+              <input name="b" num_pins="1"/>
+              <input name="cin" num_pins="1"/>
+              <output name="cout" num_pins="1"/>
+              <output name="sumout" num_pins="1"/>
+              <delay_constant max="${FA_DELAY}" in_port="adder.a" out_port="adder.sumout"/>
+              <delay_constant max="${FA_DELAY}" in_port="adder.b" out_port="adder.sumout"/>
+              <delay_constant max="${FA_DELAY}" in_port="adder.cin" out_port="adder.sumout"/>
+              <delay_constant max="${FA_DELAY}" in_port="adder.a" out_port="adder.cout"/>
+              <delay_constant max="${FA_DELAY}" in_port="adder.b" out_port="adder.cout"/>
+              <delay_constant max="${FA_DELAY}" in_port="adder.cin" out_port="adder.cout"/>
+            </pb_type>
+            <pb_type name="ff" blif_model=".latch" num_pb="2" class="flipflop">
+              <input name="D" num_pins="1" port_class="D"/>
+              <output name="Q" num_pins="1" port_class="Q"/>
+              <clock name="clk" num_pins="1" port_class="clock"/>
+              <T_setup value="${FF_T_SETUP}" port="ff.D" clock="clk"/>
+              <T_clock_to_Q max="${FF_T_CLK2Q}" port="ff.Q" clock="clk"/>
+            </pb_type>
+            <interconnect>
+              <complete name="clock" input="arithmetic.clk" output="ff.clk"/>
+              <direct name="lut_in1" input="arithmetic.in[2:0]" output="lut3[0:0].in[2:0]"/>
+              <direct name="lut_in2" input="arithmetic.in[2:0]" output="lut3[1:1].in[2:0]"/>
+              <direct name="lut_to_add1" input="lut3[0:0].out" output="adder.a">
+              </direct>
+              <direct name="lut_to_add2" input="lut3[1:1].out" output="adder.b">
+              </direct>
+              <direct name="carry_in" input="arithmetic.cin" output="adder.cin">
+                <pack_pattern name="chain" in_port="arithmetic.cin" out_port="adder.cin"/>
+              </direct>
+              <direct name="carry_out" input="adder.cout" output="arithmetic.cout">
+                <pack_pattern name="chain" in_port="adder.cout" out_port="arithmetic.cout"/>
+              </direct>
+              <mux name="cout" input="ff[0:0].Q adder.cout" output="arithmetic.out[0:0]">
+                <delay_constant max="${FLE_MUX}" in_port="adder.sumout" out_port="arithmetic.out[0:0]"/>
+                <delay_constant max="${FLE_MUX}" in_port="ff[0:0].Q" out_port="arithmetic.out[0:0]"/>
+              </mux>
+              <mux name="sumout" input="ff[1:1].Q adder.sumout" output="arithmetic.out[1:1]">
+                <delay_constant max="${FLE_MUX}" in_port="adder.sumout" out_port="arithmetic.out[1:1]"/>
+                <delay_constant max="${FLE_MUX}" in_port="ff[1:1].Q" out_port="arithmetic.out[1:1]"/>
+              </mux>
+            </interconnect>
+          </pb_type>
+          <interconnect>
+            <direct name="direct1" input="fle.in[2:0]" output="arithmetic[0:0].in"/>
+            <direct name="carry_in" input="fle.cin" output="arithmetic[0:0].cin">
+              <pack_pattern name="chain" in_port="fle.cin" out_port="arithmetic[0:0].cin"/>
+            </direct>
+            <direct name="carry_out" input="arithmetic[0:0].cout" output="fle.cout">
+              <pack_pattern name="chain" in_port="arithmetic.cout" out_port="fle.cout"/>
+            </direct>
+            <complete name="direct3" input="fle.clk" output="arithmetic.clk"/>
+            <direct name="direct4" input="arithmetic.out" output="fle.out"/>
+          </interconnect>
+        </mode>
+        <mode name="n1_lut4">
+          <pb_type name="ble4" num_pb="1">
+            <input name="in" num_pins="4"/>
+            <output name="out" num_pins="1"/>
+            <clock name="clk" num_pins="1"/>
+            <pb_type name="lut4" blif_model=".names" num_pb="1" class="lut">
+              <input name="in" num_pins="4" port_class="lut_in"/>
+              <output name="out" num_pins="1" port_class="lut_out"/>
+              <delay_matrix type="max" in_port="lut4.in" out_port="lut4.out">
+                ${LUT4_DELAY_MATRIX}
+                ${LUT4_DELAY_MATRIX}
+                ${LUT4_DELAY_MATRIX}
+                ${LUT4_DELAY_MATRIX}
+              </delay_matrix>
+            </pb_type>
+            <pb_type name="ff" blif_model=".latch" num_pb="1" class="flipflop">
+              <input name="D" num_pins="1" port_class="D"/>
+              <output name="Q" num_pins="1" port_class="Q"/>
+              <clock name="clk" num_pins="1" port_class="clock"/>
+              <T_setup value="${FF_T_SETUP}" port="ff.D" clock="clk"/>
+              <T_clock_to_Q max="${FF_T_CLK2Q}" port="ff.Q" clock="clk"/>
+            </pb_type>
+            <interconnect>
+              <direct name="direct1" input="ble4.in" output="lut4[0:0].in"/>
+              <direct name="direct2" input="lut4.out" output="ff.D">
+                <pack_pattern name="ble4" in_port="lut4.out" out_port="ff.D"/>
+              </direct>
+              <direct name="direct3" input="ble4.clk" output="ff.clk"/>
+              <mux name="mux1" input="ff.Q lut4.out" output="ble4.out">
+                <delay_constant max="${FLE_MUX}" in_port="lut4.out" out_port="ble4.out"/>
+                <delay_constant max="${FLE_MUX}" in_port="ff.Q" out_port="ble4.out"/>
+              </mux>
+            </interconnect>
+          </pb_type>
+          <interconnect>
+            <direct name="direct1" input="fle.in" output="ble4.in"/>
+            <direct name="direct2" input="ble4.out" output="fle.out[0:0]"/>
+            <direct name="direct3" input="fle.clk" output="ble4.clk"/>
+          </interconnect>
+        </mode>
+      </pb_type>
+      <interconnect>
+        <direct name="clbins" input="clb.I[31:0]" output="fle[7:0].in"/>
+        <complete name="clk" input="clb.clk[0:0]" output="fle[7:0].clk">
+        </complete>
+        <complete name="resets" input="clb.reset" output="fle[7:0].reset">
+        </complete>
+        <direct name="clbouts1" input="fle[7:0].out[0:0]" output="clb.O[7:0]"/>
+        <direct name="clbouts2" input="fle[7:0].out[1:1]" output="clb.O[15:8]"/>
+        <direct name="carry_in" input="clb.cin" output="fle[0:0].cin">
+          <delay_constant max="0.16e-9" in_port="clb.cin" out_port="fle[0:0].cin"/>
+          <pack_pattern name="chain" in_port="clb.cin" out_port="fle[0:0].cin"/>
+        </direct>
+        <direct name="carry_out" input="fle[7:7].cout" output="clb.cout">
+          <pack_pattern name="chain" in_port="fle[7:7].cout" out_port="clb.cout"/>
+        </direct>
+        <direct name="carry_link" input="fle[6:0].cout" output="fle[7:1].cin">
+          <pack_pattern name="chain" in_port="fle[6:0].cout" out_port="fle[7:1].cin"/>
+        </direct>
+      </interconnect>
+    </pb_type>
+    <pb_type name="mult_8">
+    	<input name="sign" num_pins="1"/>
+      <input name="a" num_pins="8"/>
+      <input name="b" num_pins="8"/>
+      <output name="out" num_pins="16"/>
+      <mode name="mult_8x8">
+        <pb_type name="mult_8x8_slice" num_pb="1">
+        	<input name="sign_cfg" num_pins="1"/>
+          <input name="A_cfg" num_pins="8"/>
+          <input name="B_cfg" num_pins="8"/>
+          <output name="OUT_cfg" num_pins="16"/>
+          <pb_type name="mult_8x8" blif_model=".subckt mult_8" num_pb="1">
+            <input name="sign" num_pins="1"/>
+            <input name="A" num_pins="8"/>
+            <input name="B" num_pins="8"/>
+            <output name="Y" num_pins="16"/>
+            <delay_constant max="${MULT_DELAY}" in_port="mult_8x8.sign" out_port="mult_8x8.Y"/>
+            <delay_constant max="${MULT_DELAY}" in_port="mult_8x8.A" out_port="mult_8x8.Y"/>
+            <delay_constant max="${MULT_DELAY}" in_port="mult_8x8.B" out_port="mult_8x8.Y"/>
+          </pb_type>
+          <interconnect>
+            <direct name="sign2sign" input="mult_8x8_slice.sign_cfg" output="mult_8x8.sign">
+            </direct>
+            <direct name="a2a" input="mult_8x8_slice.A_cfg" output="mult_8x8.A">
+            </direct>
+            <direct name="b2b" input="mult_8x8_slice.B_cfg" output="mult_8x8.B">
+            </direct>
+            <direct name="out2out" input="mult_8x8.Y" output="mult_8x8_slice.OUT_cfg">
+            </direct>
+          </interconnect>
+          <power method="pin-toggle">
+            <port name="sign_cfg" energy_per_toggle="2.13e-12"/> 
+            <port name="A_cfg" energy_per_toggle="2.13e-12"/>
+            <port name="B_cfg" energy_per_toggle="2.13e-12"/>
+            <static_power power_per_instance="0.0"/>
+          </power>
+        </pb_type>
+        <interconnect>
+          <direct name="sign2sign" input="mult_8.sign" output="mult_8x8_slice.sign_cfg">
+          </direct>
+          <direct name="a2a" input="mult_8.a" output="mult_8x8_slice.A_cfg">
+          </direct>
+          <direct name="b2b" input="mult_8.b" output="mult_8x8_slice.B_cfg">
+          </direct>
+          <direct name="out2out" input="mult_8x8_slice.OUT_cfg" output="mult_8.out">
+          </direct>
+        </interconnect>
+      </mode>
+      <power method="sum-of-children"/>
+    </pb_type>
+    <pb_type name="memory">
+      <input name="addr1" num_pins="10"/>
+      <input name="addr2" num_pins="10"/>
+      <input name="d_in1" num_pins="8"/>
+      <input name="d_in2" num_pins="8"/>
+      <input name="wen1" num_pins="1"/>
+      <input name="wen2" num_pins="1"/>
+      <output name="d_out1" num_pins="8"/>
+      <output name="d_out2" num_pins="8"/>
+      <clock name="clk" num_pins="1"/>
+      <mode name="mem_1024x8_dp">
+        <pb_type name="mem_1024x8_dp" blif_model=".subckt dual_port_ram" num_pb="1">
+          <input name="addr1" num_pins="10" port_class="address1"/>
+          <input name="addr2" num_pins="10" port_class="address2"/>
+          <input name="d_in1" num_pins="8" port_class="data_in1"/>
+          <input name="d_in2" num_pins="8" port_class="data_in2"/>
+          <input name="wen1" num_pins="1" port_class="write_en1"/>
+          <input name="wen2" num_pins="1" port_class="write_en2"/>
+          <output name="d_out1" num_pins="8" port_class="data_out1"/>
+          <output name="d_out2" num_pins="8" port_class="data_out2"/>
+          <clock name="clk" num_pins="1" port_class="clock"/>
+          <T_setup value="${BRAM_ADDR_T_SETUP}" port="mem_1024x8_dp.addr1" clock="clk"/>
+          <T_setup value="${BRAM_ADDR_T_SETUP}" port="mem_1024x8_dp.addr2" clock="clk"/>
+          <T_setup value="${BRAM_DIN_T_SETUP}" port="mem_1024x8_dp.d_in1" clock="clk"/>
+          <T_setup value="${BRAM_DIN_T_SETUP}" port="mem_1024x8_dp.d_in2" clock="clk"/>
+          <T_setup value="${BRAM_WEN_T_SETUP}" port="mem_1024x8_dp.wen1" clock="clk"/>
+          <T_setup value="${BRAM_WEN_T_SETUP}" port="mem_1024x8_dp.wen2" clock="clk"/>
+          <T_clock_to_Q max="${BRAM_DOUT_T_CLK2Q}" port="mem_1024x8_dp.d_out1" clock="clk"/>
+          <T_clock_to_Q max="${BRAM_DOUT_T_CLK2Q}" port="mem_1024x8_dp.d_out2" clock="clk"/>
+          <power method="pin-toggle">
+            <port name="clk" energy_per_toggle="17.9e-12"/>
+            <static_power power_per_instance="0.0"/>
+          </power>
+        </pb_type>
+        <interconnect>
+          <direct name="address1" input="memory.addr1" output="mem_1024x8_dp.addr1">
+          </direct>
+          <direct name="data_input1" input="memory.d_in1" output="mem_1024x8_dp.d_in1">
+          </direct>
+          <direct name="writeen1" input="memory.wen1" output="mem_1024x8_dp.wen1">
+          </direct>
+          <direct name="dataout1" input="mem_1024x8_dp.d_out1" output="memory.d_out1">
+          </direct>         
+          <direct name="clk_dir" input="memory.clk[0:0]" output=" mem_1024x8_dp.clk">
+          </direct>
+          <direct name="address2" input="memory.addr2" output="mem_1024x8_dp.addr2">
+          </direct>
+          <direct name="data_input2" input="memory.d_in2" output="mem_1024x8_dp.d_in2">
+          </direct>
+          <direct name="writeen2" input="memory.wen2" output="mem_1024x8_dp.wen2">
+          </direct>
+          <direct name="dataout2" input="mem_1024x8_dp.d_out2" output="memory.d_out2">
+          </direct>
+        </interconnect>
+      </mode>
+    </pb_type>
+  </complexblocklist>
+</architecture>

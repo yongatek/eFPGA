@@ -1,2 +1,13 @@
-*~
-*.swp
+**/run[0-9][0-9][0-9]
+**/latest
+**/bus_group.xml
+**/results.csv
+**/config/constraints/constraints.pcf
+**/config/constraints/bus_group.xml
+**/config/constraints/fix_pins.place
+**/config/constraints/pin_constraints.xml
+**/config/constraints/repack_design_constraints.xml
+**/yonga_archs/Fabric
+**/fpga_flow/processed_modules_index.txt
+**/__pychache
+**/__pychache/*

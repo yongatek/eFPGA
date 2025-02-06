@@ -1,0 +1,57 @@
+# Run VPR for the 'and' design
+#--write_rr_graph example_rr_graph.xml --constant_net_method route  --absorb_buffer_luts off --save_graphics on
+vpr ${VPR_ARCH_FILE} ${VPR_TESTBENCH_BLIF} --clock_modeling ideal --device ${OPENFPGA_VPR_DEVICE_LAYOUT} ${OPENFPGA_VPR_ROUTE_CHAN_WIDTH}    ${OPENFPGA_VPR_EXTRA_OPTIONS}
+
+# Read OpenFPGA architecture definition
+read_openfpga_arch -f ${OPENFPGA_ARCH_FILE}
+
+# Read OpenFPGA simulation settings
+read_openfpga_simulation_setting -f ${OPENFPGA_SIM_SETTING_FILE}
+
+# Annotate the OpenFPGA architecture to VPR data base
+# to debug use --verbose options
+link_openfpga_arch --sort_gsb_chan_node_in_edges
+
+# Check and correct any naming conflicts in the BLIF netlist
+check_netlist_naming_conflict --fix --report ./netlist_renaming.xml
+
+# Apply fix-up to Look-Up Table truth tables based on packing results
+lut_truth_table_fixup
+
+# Optionally pb pin fixup
+${OPENFPGA_PB_PIN_FIXUP_COMMAND}
+
+# Build the module graph
+#  - Enabled compression on routing architecture modules
+#  - Enable pin duplication on grid modules --group_config_block ${OPENFPGA_GROUP_TILE_CONFIG_OPTION} 
+build_fabric --compress_routing #--write_fabric_key ${OPENFPGA_VERILOG_OUTPUT_DIR}/fabric_key.xml #--verbose
+
+${OPENFPGA_ADD_FPGA_CORE_MODULE}
+
+# Write the fabric hierarchy of module graph to a file
+# This is used by hierarchical PnR flows
+#write_fabric_hierarchy --file ${OPENFPGA_VERILOG_OUTPUT_DIR}/fabric_hierarchy.txt
+
+# Repack the netlist to physical pbs
+# This must be done before bitstream generator and testbench generation
+# Strongly recommend it is done after all the fix-up have been applied
+repack ${OPENFPGA_REPACK_DESIGN_CONSTRAINTS_FILE} #--verbose
+
+# Write the Verilog netlist for FPGA fabric
+#  - Enable the use of explicit port mapping in Verilog netlist
+#write_fabric_verilog --file ${OPENFPGA_VERILOG_OUTPUT_DIR}/SRC --explicit_port_mapping --include_timing --print_user_defined_template --verbose
+
+
+#write_fabric_io_info --file ${OPENFPGA_VERILOG_OUTPUT_DIR}/fpga_io_location.xml --no_time_stamp
+# Write the SDC files for PnR backend
+#  - Turn on every options here
+write_pnr_sdc --time_unit ns --file ${OPENFPGA_VERILOG_OUTPUT_DIR}/SDC
+
+# Write SDC to disable timing for configure ports
+write_sdc_disable_timing_configure_ports --file ${OPENFPGA_VERILOG_OUTPUT_DIR}/SDC/disable_configure_ports.sdc
+
+# Finish and exit OpenFPGA
+exit
+
+# Note :
+# To run verification at the end of the flow maintain source in ./SRC directory

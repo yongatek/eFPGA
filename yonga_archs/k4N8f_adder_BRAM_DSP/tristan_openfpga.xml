@@ -1,0 +1,248 @@
+<?xml version="1.0"?>
+<openfpga_architecture>
+  <technology_library>
+    <device_library>
+      <device_model name="logic" type="transistor">
+        <lib type="industry" corner="TOP_TT" ref="M" path="${OPENFPGA_PATH}/openfpga_flow/tech/PTM_45nm/45nm.pm"/>
+        <design vdd="0.9" pn_ratio="2"/>
+        <pmos name="pch" chan_length="40e-9" min_width="140e-9" variation="logic_transistor_var"/>
+        <nmos name="nch" chan_length="40e-9" min_width="140e-9" variation="logic_transistor_var"/>
+      </device_model>
+      <device_model name="io" type="transistor">
+        <lib type="academia" ref="M" path="${OPENFPGA_PATH}/openfpga_flow/tech/PTM_45nm/45nm.pm"/>
+        <design vdd="2.5" pn_ratio="3"/>
+        <pmos name="pch_25" chan_length="270e-9" min_width="320e-9" variation="io_transistor_var"/>
+        <nmos name="nch_25" chan_length="270e-9" min_width="320e-9" variation="io_transistor_var"/>
+      </device_model>
+    </device_library>
+    <variation_library>
+      <variation name="logic_transistor_var" abs_deviation="0.1" num_sigma="3"/>
+      <variation name="io_transistor_var" abs_deviation="0.1" num_sigma="3"/>
+    </variation_library>
+  </technology_library>
+  <circuit_library>
+    <circuit_model type="inv_buf" name="INV" prefix="INV" is_default="true" verilog_netlist="yonga_archs/cell_library/INV.v">
+      <design_technology type="cmos" topology="inverter" size="1"/>
+      <device_technology device_model_name="logic"/>
+      <port type="input" prefix="in" lib_name="I" size="1"/>
+      <port type="output" prefix="out" lib_name="ZN" size="1"/>
+      <delay_matrix type="rise" in_port="in" out_port="out">
+        10e-12
+      </delay_matrix>
+      <delay_matrix type="fall" in_port="in" out_port="out">
+        10e-12
+      </delay_matrix>
+    </circuit_model>
+      <circuit_model type="inv_buf" name="BUF" prefix="BUF" is_default="false" verilog_netlist="yonga_archs/cell_library/BUF.v">
+      <design_technology type="cmos" topology="buffer" size="1" num_level="2" f_per_stage="2"/>
+      <device_technology device_model_name="logic"/>
+      <port type="input" prefix="in" lib_name="I" size="1"/>
+      <port type="output" prefix="out" lib_name="Z" size="1"/>
+      <delay_matrix type="rise" in_port="in" out_port="out">
+        10e-12
+      </delay_matrix>
+      <delay_matrix type="fall" in_port="in" out_port="out">
+        10e-12
+      </delay_matrix>
+    </circuit_model>
+    <circuit_model type="gate" name="OR2" prefix="OR2" is_default="true" verilog_netlist="yonga_archs/cell_library/OR2.v">
+      <design_technology type="cmos" topology="OR"/>
+      <device_technology device_model_name="logic"/>
+      <input_buffer exist="false"/>
+      <output_buffer exist="false"/>
+      <port type="input" prefix="a" lib_name="A1" size="1"/>
+      <port type="input" prefix="b" lib_name="A2" size="1"/>
+      <port type="output" prefix="out" lib_name="Z" size="1"/>
+      <delay_matrix type="rise" in_port="a b" out_port="out">
+        10e-12 5e-12
+      </delay_matrix>
+      <delay_matrix type="fall" in_port="a b" out_port="out">
+        10e-12 5e-12
+      </delay_matrix>
+    </circuit_model>
+
+    <circuit_model type="gate" name="MUX2" prefix="MUX2" verilog_netlist="yonga_archs/cell_library/MUX2.v">
+      <design_technology type="cmos" topology="MUX2"/>
+      <device_technology device_model_name="logic"/>
+      <input_buffer exist="false"/>
+      <output_buffer exist="false"/>
+      <port type="input" prefix="in0" lib_name="I1" size="1"/>
+      <port type="input" prefix="in1" lib_name="I0" size="1"/>
+      <port type="input" prefix="sel" lib_name="S" size="1"/>
+      <port type="output" prefix="out" lib_name="Z" size="1"/>
+    </circuit_model>
+
+    <circuit_model type="chan_wire" name="chan_segment" prefix="track_seg" is_default="true">
+      <design_technology type="cmos"/>
+      <input_buffer exist="false"/>
+      <output_buffer exist="false"/>
+      <port type="input" prefix="in" size="1"/>
+      <port type="output" prefix="out" size="1"/>
+      <wire_param model_type="pi" R="101" C="22.5e-15" num_level="1"/>
+      <!-- model_type could be T, res_val and cap_val DON'T CARE -->
+    </circuit_model>
+    <circuit_model type="wire" name="WIRE" prefix="WIRE" is_default="true" >
+      <design_technology type="cmos"/>
+      <input_buffer exist="false"/>
+      <output_buffer exist="false"/>
+      <port type="input" prefix="in" size="1"/>
+      <port type="output" prefix="out" size="1"/>
+      <wire_param model_type="pi" R="0" C="0" num_level="1"/>
+    </circuit_model>
+    <circuit_model type="mux" name="mux_tree" prefix="mux_tree" is_default="true" dump_structural_verilog="true">
+      <design_technology type="cmos" structure="tree" add_const_input="true" const_input_val="1"/>
+      <input_buffer exist="false"/>
+      <output_buffer exist="false"/>
+      <pass_gate_logic circuit_model_name="MUX2"/>
+      <port type="input" prefix="in" size="1"/>
+      <port type="output" prefix="out" size="1"/>
+      <port type="sram" prefix="sram" size="1"/>
+    </circuit_model>
+    <circuit_model type="mux" name="mux_tree_tapbuf" prefix="mux_tree_tapbuf" dump_structural_verilog="true">
+      <design_technology type="cmos" structure="tree" add_const_input="true" const_input_val="1"/>
+      <input_buffer exist="false"/>
+      <output_buffer exist="false"/>
+      <pass_gate_logic circuit_model_name="MUX2"/>
+      <port type="input" prefix="in" size="1"/>
+      <port type="output" prefix="out" size="1"/>
+      <port type="sram" prefix="sram" size="1"/>
+    </circuit_model>
+    <circuit_model type="ff" name="DFFRQ" prefix="DFFRQ" verilog_netlist="yonga_archs/cell_library/DFFRQ.v">
+      <design_technology type="cmos"/>
+      <input_buffer exist="false"/>
+      <output_buffer exist="false"/>
+      <port type="input" prefix="D" size="1"/>
+      <port type="input" prefix="reset" lib_name="RST" size="1" default_val="1"/>
+      <port type="output" prefix="Q" size="1"/>
+      <port type="clock" prefix="clk" lib_name="CK" size="1" default_val="0"/>
+    </circuit_model>
+    <circuit_model type="lut" name="frac_lut4" prefix="frac_lut4" dump_structural_verilog="true">
+      <design_technology type="cmos" fracturable_lut="true"/>
+      <input_buffer  exist="false"/>
+      <output_buffer exist="false"/>
+      <lut_input_inverter exist="true" circuit_model_name="INV"/>
+      <lut_input_buffer exist="true" circuit_model_name="BUF"/>
+      <lut_intermediate_buffer exist="true" circuit_model_name="BUF" location_map="-1-"/>
+      <pass_gate_logic circuit_model_name="MUX2"/>
+      <port type="input" prefix="in" size="4" tri_state_map="---1" circuit_model_name="OR2"/>
+      <port type="output" prefix="lut3_out" size="2" lut_frac_level="3" lut_output_mask="0,1"/>
+      <port type="output" prefix="lut4_out" size="1" lut_output_mask="0"/>
+      <port type="sram" prefix="sram" size="16"/>
+      <port type="sram" prefix="mode" size="1" mode_select="true" circuit_model_name="EDFF" default_val="1"/>
+    </circuit_model>
+    
+    <circuit_model type="ccff" name="EDFF" prefix="EDFF" verilog_netlist="yonga_archs/cell_library/EDFF.v">
+      <design_technology type="cmos"/>
+      <input_buffer exist="false" />
+      <output_buffer exist="false"/>
+      <port type="input" prefix="D" size="1"/>
+      <port type="input" prefix="config_enable" lib_name="E" size="1" is_global="true" default_val="1" is_config_enable="true"/>
+      <port type="output" prefix="Q" size="1"/>
+      <port type="clock" prefix="prog_clk" lib_name="CK" size="1" is_global="true" default_val="0" is_prog="true"/>
+    </circuit_model>
+    <circuit_model type="iopad" name="EMBEDDED_IO" prefix="EMBEDDED_IO" is_default="true" verilog_netlist="yonga_archs/cell_library/EMBEDDED_IO.v">
+      <design_technology type="cmos"/>
+      <input_buffer exist="false"/>
+      <output_buffer exist="false"/>
+      <port type="input" prefix="SOC_IN" lib_name="SOC_IN" size="1" is_global="true" is_io="true" is_data_io="true"/>
+      <port type="output" prefix="SOC_OUT" lib_name="SOC_OUT" size="1" is_global="true" is_io="true" is_data_io="true"/>
+      <port type="output" prefix="SOC_DIR" lib_name="SOC_DIR" size="1" is_global="true" is_io="true"/>
+      <port type="output" prefix="inpad" lib_name="FPGA_IN" size="1"/>
+      <port type="input" prefix="outpad" lib_name="FPGA_OUT" size="1"/>
+      <port type="sram" prefix="en" lib_name="FPGA_DIR" size="1" mode_select="true" circuit_model_name="EDFF" default_val="1"/>
+    </circuit_model>
+    <circuit_model type="hard_logic" name="mult_8x8" prefix="mult_8x8" is_default="true" verilog_netlist="yonga_archs/cell_library/mult_8x8.v">
+      <design_technology type="cmos"/>
+      <input_buffer exist="false"/>
+      <output_buffer exist="false"/>
+      <port type="input" prefix="sign" lib_name="sign" size="1"/>
+      <port type="input" prefix="A" lib_name="A" size="8"/>
+      <port type="input" prefix="B" lib_name="B" size="8"/>
+      <port type="output" prefix="Y" lib_name="Y" size="16"/>
+    </circuit_model>
+    <circuit_model type="hard_logic" name="dpram_1024x8" prefix="dpram_1024x8" verilog_netlist="yonga_archs/cell_library/dpram_1024x8.v">
+      <design_technology type="cmos"/>
+      <input_buffer exist="false"/>
+      <output_buffer exist="false"/>
+      <port type="input" prefix="addr1" size="10"/>
+      <port type="input" prefix="d_in1" size="8"/>
+      <port type="input" prefix="wen1" size="1"/>
+      <port type="output" prefix="d_out1" size="8"/>
+      <port type="clock" prefix="clk" size="1" is_global="false" default_val="0"/>
+      <port type="input" prefix="addr2" size="10"/>
+      <port type="input" prefix="d_in2" size="8"/>
+      <port type="input" prefix="wen2" size="1"/>
+      <port type="output" prefix="d_out2" size="8"/>
+    </circuit_model>
+    <circuit_model type="hard_logic" name="FA" prefix="FA" verilog_netlist="yonga_archs/cell_library/FA.v">
+      <design_technology type="cmos"/>
+      <input_buffer exist="false"/>
+      <output_buffer exist="false"/>
+      <port type="input" prefix="a" lib_name="A" size="1"/>
+      <port type="input" prefix="b" lib_name="B" size="1"/>
+      <port type="input" prefix="cin" lib_name="CI" size="1"/>
+      <port type="output" prefix="sumout" lib_name="S" size="1"/>
+      <port type="output" prefix="cout" lib_name="CO" size="1"/>
+    </circuit_model>    
+  </circuit_library>
+  <configuration_protocol>
+    <organization type="scan_chain" circuit_model_name="EDFF" num_regions="32"/>
+  </configuration_protocol>
+  <connection_block>
+    <switch name="ipin_cblock" circuit_model_name="mux_tree_tapbuf"/>
+  </connection_block>
+  <switch_block>
+    <switch name="L1_mux" circuit_model_name="mux_tree_tapbuf"/>
+    <switch name="L2_mux" circuit_model_name="mux_tree_tapbuf"/>
+    <switch name="L4_mux" circuit_model_name="mux_tree_tapbuf"/>
+    <switch name="L8_mux" circuit_model_name="mux_tree_tapbuf"/>
+  </switch_block>
+  <routing_segment>
+    <segment name="L1" circuit_model_name="chan_segment"/>
+    <segment name="L2" circuit_model_name="chan_segment"/>
+    <segment name="L4" circuit_model_name="chan_segment"/>
+    <segment name="L8" circuit_model_name="chan_segment"/>
+  </routing_segment>
+  <direct_connection>
+    <direct name="adder_carry" circuit_model_name="WIRE"/>
+  </direct_connection>
+  <tile_annotations>
+    <global_port name="clk" is_clock="true" default_val="0">
+      <tile name="clb" port="clk[0:0]" x="-1" y="-1"/>
+      <tile name="memory" port="clk[0:0]" x="-1" y="-1"/>
+    </global_port>
+    <global_port name="Reset" is_reset="true" default_val="1">
+      <tile name="clb" port="reset" x="-1" y="-1"/>
+    </global_port>
+  </tile_annotations>
+  <pb_type_annotations>
+    <pb_type name="io" physical_mode_name="physical" idle_mode_name="inpad"/>
+    <pb_type name="io[physical].iopad" circuit_model_name="EMBEDDED_IO" mode_bits="1"/>
+    <pb_type name="io[inpad].inpad" physical_pb_type_name="io[physical].iopad" mode_bits="1"/>
+    <pb_type name="io[outpad].outpad" physical_pb_type_name="io[physical].iopad" mode_bits="0"/>
+    <pb_type name="clb.fle" physical_mode_name="physical"/>
+    <pb_type name="clb.fle[physical].fabric.frac_logic.frac_lut4" circuit_model_name="frac_lut4" mode_bits="0"/>
+    <pb_type name="clb.fle[physical].fabric.ff" circuit_model_name="DFFRQ"/>
+    <pb_type name="clb.fle[physical].fabric.adder" circuit_model_name="FA"/>
+    <pb_type name="clb.fle[n2_lut3].lut3inter.ble3.lut3" physical_pb_type_name="clb.fle[physical].fabric.frac_logic.frac_lut4" mode_bits="1" physical_pb_type_index_factor="0.5">
+      <port name="in" physical_mode_port="in[0:2]"/>
+      <port name="out" physical_mode_port="lut3_out[0:0]" physical_mode_pin_rotate_offset="1"/>
+    </pb_type>
+    <pb_type name="clb.fle[n2_lut3].lut3inter.ble3.ff" physical_pb_type_name="clb.fle[physical].fabric.ff"/>
+    <pb_type name="clb.fle[arithmetic].arithmetic.lut3" physical_pb_type_name="clb.fle[physical].fabric.frac_logic.frac_lut4" mode_bits="1" physical_pb_type_index_factor="0.5">
+      <port name="in" physical_mode_port="in[0:2]"/>
+      <port name="out" physical_mode_port="lut3_out[0:0]" physical_mode_pin_rotate_offset="1"/>
+    </pb_type>
+    <pb_type name="clb.fle[arithmetic].arithmetic.adder" physical_pb_type_name="clb.fle[physical].fabric.adder"/>
+    <pb_type name="clb.fle[arithmetic].arithmetic.ff" physical_pb_type_name="clb.fle[physical].fabric.ff"/>
+    <pb_type name="clb.fle[n1_lut4].ble4.lut4" physical_pb_type_name="clb.fle[physical].fabric.frac_logic.frac_lut4" mode_bits="0">
+      <port name="in" physical_mode_port="in[0:3]"/>
+      <port name="out" physical_mode_port="lut4_out"/>
+    </pb_type>
+    <pb_type name="clb.fle[n1_lut4].ble4.ff" physical_pb_type_name="clb.fle[physical].fabric.ff" physical_pb_type_index_factor="2" physical_pb_type_index_offset="0"/>
+    <pb_type name="mult_8" physical_mode_name="mult_8x8" idle_mode_name="mult_8x8"/>
+    <pb_type name="mult_8[mult_8x8].mult_8x8_slice.mult_8x8" circuit_model_name="mult_8x8"/>
+    <pb_type name="memory[mem_1024x8_dp].mem_1024x8_dp" circuit_model_name="dpram_1024x8"/> 
+
+  </pb_type_annotations>
+</openfpga_architecture>

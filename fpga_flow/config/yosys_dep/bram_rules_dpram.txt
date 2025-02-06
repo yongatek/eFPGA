@@ -1,0 +1,10 @@
+ram block $__MY_DPRAM_1024x8 {
+  abits 10;
+  width 8;
+  byte 8;
+  init none;
+  port srsw "A" "B" {
+  	clock posedge;
+  }
+}
+
