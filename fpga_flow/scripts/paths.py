@@ -19,9 +19,9 @@ def get_TRISTAN_EFPGA_PATH():
 
     # Ensure the path contains the necessary part of the directory
     try:
-        efpga_base_path = dir_path[:dir_path.index("efpga-design-flow/") + len("efpga-design-flow/")]
+        efpga_base_path = dir_path[:dir_path.index("eFPGA/") + len("eFPGA/")]
     except ValueError:
-        print("Error: 'efpga-design-flow/' not found in the path.")
+        print("Error: 'eFPGA/' not found in the path.")
         raise
     return efpga_base_path
 
