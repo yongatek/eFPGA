@@ -11,7 +11,6 @@ It will recognize any RTL in the benchmark directory **(../benchmarks)**
 Note that the benchmark should share the same name as the top module, otherwise it won't be correctly recognized by this script.
 Additionally, benchmarks that consist of multiple files should be placed in folder that has the name of the top module, the script will automatically add all the files within the folder
 
-
 ## This script supports the following flows:
 <ins>**0: Generate fabric**</ins> &rarr; Generate the netlist and place it under directory  ```$TRISTAN_EFPGA_PATH/yonga_archs/Fabric```
 
@@ -28,7 +27,7 @@ Additionally, benchmarks that consist of multiple files should be placed in fold
 ## Some rules to use the script:
 - To use the global reset pin automatically, the benchmark should use the name "Reset"
 
-- The global pin is active low. There is not global set signal, so benchmarks using a global reset cannot reset a flop to a non-zero value
+- The global pin is active low. There is no global set signal, so benchmarks using a global reset cannot reset a flop to a non-zero value
 
 - To use a logical reset that is only triggered at the start of the simulation, the benchmark should use the name "reset"
 Other names for the reset signal are not recognized and are treated as general inputs (random input stimulus). 
@@ -45,3 +44,4 @@ Other names for the reset signal are not recognized and are treated as general i
 
 - When changing the architecture the yosys synthesis script should be adjusted accordingly (task.conf and yosys_dep files used)
 
+- Previous runs can be cleared by using the script ./clear_run.sh
