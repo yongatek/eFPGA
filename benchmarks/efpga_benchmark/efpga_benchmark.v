@@ -2,16 +2,14 @@
 // File      : efpga_benchmark.v
 // Purpose   : eFPGA SoC Integration Benchmark – Top-Level Interface Wrapper
 // =============================================================================
-// This module is a thin interface shell.  All functional logic lives in the
-// mode_test_benchmark submodule below so that the interface can be reused with
-// alternate benchmark implementations by swapping only the submodule.
+// This module is a thin interface shell.  This module can be used as a top 
+// level wrapper for any eFPGA SoC integration benchmark.  The interface is
+// designed to according to the eFPGA subsystem integration.
 // =============================================================================
 
 `timescale 1ns/1ps
 
 module efpga_benchmark 
-// #( parameter packer_mode = 0,
-//                           parameter unpacker_mode = 0)
  (
     input  wire        clk,
     input  wire        reset_n,
@@ -47,21 +45,6 @@ module efpga_benchmark
     .gpio_in          (gpio_in),
     .gpio_out         (gpio_out)
   );
-  // reg [63:0] cnt;
-  // reg cnt_valid;
-  // assign data_in_ready = 1'b1;
-  // assign data_out = cnt;
-  // assign data_out_strobe = cnt_valid;
-  // assign gpio_out = ~ gpio_in;
-  // assign interrupt = cnt > 64;
-  // always @(posedge clk) begin
-  //   cnt_valid <= 0;
-  //   if(~reset_n) begin
-  //     cnt <= 64'b0;
-  //   end else if(data_out_ready) begin
-  //     cnt = cnt + 1;
-  //     cnt_valid <=1;
-  //   end
-  // end
+
 
 endmodule
