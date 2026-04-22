@@ -1,8 +1,9 @@
+#!/usr/bin/env python3
 #----------------------------------------------------------------#
 # Module:       eFPGA Flow script
 # Company:      Yongatek Microelectronics
 # Author:       Ahmad Houraniah
-# Version:      0.2.0
+# Version:      1.0.0
 # Description:  This script is used to generated FPGA fabrics (RTL and Timing Constraints),
 #               generate bitstreams and testbenches, evaluate FPGA performance, 
 #               and run simulations.
@@ -18,7 +19,7 @@ from scripts.benchmark import Benchmark
 from scripts.task_conf import TaskConf
 from scripts.simulate import simulate
 from scripts.fix_sdc import generate_tile_based_sdcs
-from scripts.task_helper import generate_bus_group_file, set_pin_constraints
+from scripts.task_helper import generate_bus_group_file, set_pin_constraints, load_device_resources
 
 def use_docker() -> bool:
     """
@@ -65,7 +66,7 @@ def select_benchmark(benchmarks, tb_type):
         return [benchmarks[selected_benchmark]]
     return benchmarks
 
-def run_task_for_benchmark(task_conf_script: TaskConf, benchmark: Benchmark, tb_type: int, arch_name: str, simulator: str, tbs, autoset_pcf = False):
+def run_task_for_benchmark(task_conf_script: TaskConf, benchmark: Benchmark, tb_type: int, arch_name: str, simulator: str, run_number: int, tbs, autoset_pcf = False):
     """
     Runs the task for a given benchmark.
 
@@ -75,6 +76,7 @@ def run_task_for_benchmark(task_conf_script: TaskConf, benchmark: Benchmark, tb_
         tb_type (int): Type of testbench.
         arch_name (str): Architecture name.
         simulator (str): Simulator to use.
+        run_number (int): The run number.
         tbs (list[str]): List of testbenches.
 
     Returns:
@@ -96,7 +98,7 @@ def run_task_for_benchmark(task_conf_script: TaskConf, benchmark: Benchmark, tb_
 
     task_conf_script.update_task_conf()
     run_status = task_conf_script.run_task()
-    sim_res, area = simulate(tb_type, benchmark, arch_name, simulator, tbs, run_status)
+    sim_res, area = simulate(tb_type, benchmark, arch_name, simulator, run_number, tbs, run_status)
     return sim_res, area
 
 
@@ -107,16 +109,35 @@ def set_simulator() -> str:
     Returns:
         str: The simulator to use.
     """
-    simulators = ["vcs", "vlog", "iverilog"] # Synopsys VCS, ModelSim/QuestaSim, Icarus Verilog
+    simulators = ["vcs", "vlog", "iverilog", "xrun"] # Synopsys VCS, ModelSim/QuestaSim, Icarus Verilog
     for simulator in simulators:
         if os.system(f"command -v {simulator}") == 0:
             return simulator
     raise EnvironmentError("No suitable simulator found")
 
+def get_latest_run_number():
+    """
+    Gets the current run number by finding the highest numbered run directory.
+    
+    Returns:
+        int: The current run number.
+    """
+    run_dirs = []
+    for item in os.listdir('.'):
+        if item.startswith('run') and item[3:].isdigit():
+            run_dirs.append(int(item[3:]))
+    
+    if run_dirs:
+        return max(run_dirs)
+    else:
+        return 0
+
 def main():
-    pins_per_io = [2, 2, 2, 2]
+    device_resources = load_device_resources()
+    pins_per_io = device_resources['pins_per_io']
+    # [0, 0, 13, 0] #top, right, bottom, left
     simulator = set_simulator()
-    freq = (50, 10, 10)
+    freq = (50, 50, 50)
     docker = use_docker()
     task_conf_script = TaskConf(docker, pins_per_io)
     arch_name = task_conf_script.get_arch_name()
@@ -129,16 +150,19 @@ def main():
     task_conf_script.set_openfpga_shell_script(tb_type)
     if tb_type > 1:
         results = []
-        # Different headers based on tb_type
-        headers = ["Benchmark", "Device Utilization", "IO Utilization", "CLB Utilization", 
+        # Different headers based on tb_type - add Run Number as first column
+        headers = ["Run Number", "Benchmark", "Device Utilization", "IO Utilization", "CLB Utilization", 
                   "DSP Utilization", "BRAM Utilization", "Fmax", "Critical path", 
                   'L1 Utilization', 'L2 Utilization', 'L4 Utilization']
         if tb_type != 5:
-            headers.insert(1, "Simulation Result")
+            headers.insert(2, "Simulation Result")  # Insert after Run Number and Benchmark
         row_list = [headers]
         
         start_time = time.time()
         for benchmark_name in benchmarks:
+            # Get a new run number for each benchmark
+            run_number = get_latest_run_number() + 1
+            
             benchmark = Benchmark(benchmark_name)
             print(f'************************************************\nBENCHMARK : {benchmark.get_name()}\n************************************************')
             try:
@@ -146,30 +170,34 @@ def main():
                     autoset_pcf = True
                 else:  
                     autoset_pcf = False
-                sim_res, area = run_task_for_benchmark(task_conf_script, benchmark, tb_type, arch_name, simulator, tbs, autoset_pcf)
+                sim_res, area = run_task_for_benchmark(task_conf_script, benchmark, tb_type, arch_name, simulator, run_number, tbs, autoset_pcf)
                 if tb_type == 5:
                     results.append(f'{area}')
-                    row_data = [benchmark.get_name(), area["Device"], area['io'], area['clb'], 
-                              area['mult_18'], area['memory'], area['Fmax'], area['Critical path'], 
+                    row_data = [run_number, benchmark.get_name(), area["Device"], area['io'], area['clb'], 
+                              area['mult_16'], area['memory'], area['Fmax'], area['Critical path'], 
                               area['L1'], area['L2'], area['L4']]
                 else:
                     results.append(f'Simulation Result : {"Passed!" if sim_res else "Failed!"} || {area}')
-                    row_data = [benchmark.get_name(), "Passed!" if sim_res else "Failed!"]
-                    row_data.extend([area["Device"], area['io'], area['clb'], area['mult_18'], 
+                    row_data = [run_number, benchmark.get_name(), "Passed!" if sim_res else "Failed!"]
+                    row_data.extend([area["Device"], area['io'], area['clb'], area['mult_16'], 
                                    area['memory'], area['Fmax'], area['Critical path'], 
                                    area['L1'], area['L2'], area['L4']])
                 row_list.append(row_data)
+                if(len(benchmarks)>1):
+                    print(f'Benchmark: {benchmark_name} || {area}')
             except Exception as e:
                 print(e)
                 if tb_type == 5:
                     results.append('na')
-                    row_list.append([benchmark.get_name()] + ['na'] * (len(headers)-1))
+                    row_list.append([run_number, benchmark.get_name()] + ['na'] * (len(headers)-2))
                 else:
                     results.append('Simulation Result : Failed! || na')
-                    row_list.append([benchmark.get_name(), "Failed!"] + ['na'] * (len(headers)-2))
-                print(f'{benchmark.get_name()} failed')
+                    row_list.append([run_number, benchmark.get_name(), "Failed!"] + ['na'] * (len(headers)-3))
+                print(f'{benchmark.get_name()} Failed !!!!')
             if not sim_res and tb_type != 5:
-                print('Failed sim !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
+                print('***************  !!! Failed !!!!  **************')
+            if(len(benchmarks) > 1):
+                print(f'Benchmark: {benchmark.get_name()} || {row_data}')
             print('************************************************')
 
         for benchmark_name, result in zip(benchmarks, results):

@@ -4,7 +4,7 @@ import glob
 from scripts.task_helper import write_clock_constraints, map_rst_and_clocks, generate_bus_group_file, set_pin_constraints, flatten_constraints
 from scripts.benchmark import Benchmark
 from scripts.paths import get_TRISTAN_EFPGA_PATH, get_fabric_path
-from scripts.fix_netlist import replace_def_net_type, fix_fabric_netlist_path, generate_flist
+from scripts.fix_netlist import replace_def_net_type, fix_fabric_netlist_path, generate_flist, fix_netlist, replace_include_paths
 from scripts.utils.verilator_component_parser import verilator_component_parser as vcp
 from scripts.utils.include_parser import include_parser as ip
 from scripts.utils.include_parser import flist_parser as fp
@@ -91,13 +91,12 @@ class TaskConf:
 
     def run_task(self):
         """Runs the task based on the testbench type."""
-        if self.tb_type > 1:
+        if self.tb_type == 0 :
             self.generate_pin_map_csv()
-        else:
+            self._cleanup_old_rtl() 
             self._cleanup_old_sdc() 
-            if self.tb_type == 0 :
-                self._cleanup_old_rtl() 
-
+        elif self.tb_type == 1: 
+            self._cleanup_old_sdc() 
         flatten_constraints()
         return self._execute_task_flow()
 
@@ -140,7 +139,12 @@ class TaskConf:
         stream = os.popen(command)
         output = stream.read()
         if 'ERROR' in output:
-            print("Task execution failed with error.")
+            print("OpenFPGA task failed.")
+            # Print log path for debugging
+            if hasattr(self, 'benchmark') and self.benchmark:
+                log_path = f"latest/{self.arch_name}/{self.benchmark.get_name()}/MIN_ROUTE_CHAN_WIDTH/openfpgashell.log"
+                print(f"Log available at: {log_path}")
+
             return False
         print(output)
 
@@ -154,6 +158,7 @@ class TaskConf:
         fix_fabric_netlist_path()
         generate_flist()
         replace_def_net_type()
+        fix_netlist()
         vcp.parse_as_module(get_fabric_path() + "SRC/sub_module/", False, True)
         ip.modify_include_file("../yonga_archs/Fabric/SRC/fabric_netlists.v", "processed_modules_index.txt")
         fp.do_convert_include_to_flist("../yonga_archs/Fabric/SRC/fabric_netlists.v", "sub_module", "../yonga_archs/Fabric/SRC/fabric_netlists.flist", "sub_module")
@@ -165,10 +170,11 @@ class TaskConf:
 
         x, y = self.get_fpga_size()
         gen_layout_csv(max(x, y))
+        replace_include_paths(get_TRISTAN_EFPGA_PATH()[:-1] + "/yonga_archs/Fabric/SRC/fabric_netlists.v")
 
     def generate_pin_map_csv(self):
         """Generates a CSV file for pin mapping."""
-        height, width = self.get_fpga_size()
+        width, height = self.get_fpga_size()
         height -= 2
         width -= 2
 
@@ -189,23 +195,23 @@ class TaskConf:
         start = 0
         end = width * self.pins_per_io[0]
         for i in range(start, end):
-            file.write(f'TOP,,,,gfpga_pad_EMBEDDED_IO_SOC_IN[{i}],pad_fpga_io[{i}],in,,\n')
-            file.write(f'TOP,,,,gfpga_pad_EMBEDDED_IO_SOC_OUT[{i}],pad_fpga_io[{i}],out,,\n')
+            file.write(f'TOP,,,,gfpga_pad_EMBEDDED_IO_ISOL_SOC_IN[{i}],pad_fpga_io[{i}],in,,\n')
+            file.write(f'TOP,,,,gfpga_pad_EMBEDDED_IO_ISOL_SOC_OUT[{i}],pad_fpga_io[{i}],out,,\n')
 
         start = end
         end += height * self.pins_per_io[1]
         for i in range(start, end):
-            file.write(f'RIGHT,,,,gfpga_pad_EMBEDDED_IO_SOC_IN[{i}],pad_fpga_io[{i}],in,,\n')
-            file.write(f'RIGHT,,,,gfpga_pad_EMBEDDED_IO_SOC_OUT[{i}],pad_fpga_io[{i}],out,,\n')
+            file.write(f'RIGHT,,,,gfpga_pad_EMBEDDED_IO_ISOL_SOC_IN[{i}],pad_fpga_io[{i}],in,,\n')
+            file.write(f'RIGHT,,,,gfpga_pad_EMBEDDED_IO_ISOL_SOC_OUT[{i}],pad_fpga_io[{i}],out,,\n')
 
         start = end
-        end += (width - 2) * self.pins_per_io[2]
+        end += width * self.pins_per_io[2]
         for i in range(start, end):
-            file.write(f'BOTTOM,,,,gfpga_pad_EMBEDDED_IO_SOC_IN[{i}],pad_fpga_io[{i}],in,,\n')
-            file.write(f'BOTTOM,,,,gfpga_pad_EMBEDDED_IO_SOC_OUT[{i}],pad_fpga_io[{i}],out,,\n')
+            file.write(f'BOTTOM,,,,gfpga_pad_EMBEDDED_IO_ISOL_SOC_IN[{i}],pad_fpga_io[{i}],in,,\n')
+            file.write(f'BOTTOM,,,,gfpga_pad_EMBEDDED_IO_ISOL_SOC_OUT[{i}],pad_fpga_io[{i}],out,,\n')
 
         start = end
-        end += (height - 2) * self.pins_per_io[3]
+        end += (height) * self.pins_per_io[3]
         for i in range(start, end):
-            file.write(f'LEFT,,,,gfpga_pad_EMBEDDED_IO_SOC_IN[{i}],pad_fpga_io[{i}],in,,\n')
-            file.write(f'LEFT,,,,gfpga_pad_EMBEDDED_IO_SOC_OUT[{i}],pad_fpga_io[{i}],out,,\n')
+            file.write(f'LEFT,,,,gfpga_pad_EMBEDDED_IO_ISOL_SOC_IN[{i}],pad_fpga_io[{i}],in,,\n')
+            file.write(f'LEFT,,,,gfpga_pad_EMBEDDED_IO_ISOL_SOC_OUT[{i}],pad_fpga_io[{i}],out,,\n')

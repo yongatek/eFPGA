@@ -2,7 +2,7 @@
 # Module:       generate_layout_csv.py
 # Company:      Yongatek Microelectronics
 # Author:       Ahmad Houraniah
-# Version:      0.1.0
+# Version:      1.0.0
 # Description:  This script is used to generate the FPGA CSV layout 
 #               file based on the generated RTL. 
 #----------------------------------------------------------------#
@@ -11,7 +11,7 @@ import re
 import csv
 
 def parse_verilog(vfile):
-    pattern = r'tile_(\d+)__(\d+)_ tile_(\d+)__(\d+)_'
+    pattern = r'tile_(\d+)__(\d+)(?:_v2|_) tile_(\d+)__(\d+)_'
     tiles = []
     with open(vfile, 'r') as file:
         for line in file:
@@ -19,7 +19,10 @@ def parse_verilog(vfile):
             matches = re.findall(pattern, line)
             for match in matches:
                 x, y, nx, ny = map(int, match)  # Convert matched strings to integers
-                tiles.append([f"tile_{x}__{y}_", nx, ny])
+                if (f"tile_{x}__{y}_v2" in line):
+                    tiles.append([f"tile_{x}__{y}_v2", nx, ny])
+                else:
+                    tiles.append([f"tile_{x}__{y}_", nx, ny])
     return tiles
 
 def create_fpga_layout(tiles, grid_size=20):
@@ -36,7 +39,7 @@ def write_to_csv(grid, output_csv):
         writer.writerows(grid[::-1])
 
 def gen_layout_csv(size):
-    vfile = "../yonga_archs/Fabric/SRC/fpga_top.v"
+    vfile = "../yonga_archs/Fabric/SRC/fpga_core.v"
     output_csv = "../yonga_archs/Fabric/fpga_layout.csv"
     tiles = parse_verilog(vfile)  # Parse the Verilog file for tile information
     grid = create_fpga_layout(tiles, size)  # Create the FPGA layout grid

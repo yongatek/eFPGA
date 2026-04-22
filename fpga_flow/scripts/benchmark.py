@@ -2,7 +2,7 @@
 # Module:       Benchmark class
 # Company:      Yongatek Microelectronics
 # Author:       Ahmad Houraniah
-# Version:      0.1.0
+# Version:      1.0.0
 # Description:  This class stores information about the current 
 #               benchmark, including the benchmark name, path, and
 #               top module code.
