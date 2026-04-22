@@ -1,0 +1,25 @@
+<module_names>
+	<module_name default="cbx_1__0_" given="cbx_0_" />
+	<module_name default="cbx_1__1_" given="cbx_1_" />
+	<module_name default="cbx_1__3_" given="cbx_2_" />
+	<module_name default="cbx_1__7_" given="cbx_3_" />
+	<module_name default="cbx_2__7_" given="cbx_4_" />
+	<module_name default="cby_0__1_" given="cby_0_" />
+	<module_name default="cby_1__1_" given="cby_1_" />
+	<module_name default="cby_1__4_" given="cby_2_" />
+	<module_name default="cby_1__8_" given="cby_3_" />
+	<module_name default="cby_2__8_" given="cby_4_" />
+	<module_name default="sb_0__0_"  given="sb_0_"  />
+	<module_name default="sb_0__19_" given="sb_2_"  />
+	<module_name default="sb_0__1_"  given="sb_1_"  />
+	<module_name default="sb_11__0_" given="sb_11_" />
+	<module_name default="sb_11__1_" given="sb_12_" />
+	<module_name default="sb_1__0_"  given="sb_3_"  />
+	<module_name default="sb_1__1_"  given="sb_4_"  />
+	<module_name default="sb_1__3_"  given="sb_5_"  />
+	<module_name default="sb_1__4_"  given="sb_6_"  />
+	<module_name default="sb_1__7_"  given="sb_7_"  />
+	<module_name default="sb_1__8_"  given="sb_8_"  />
+	<module_name default="sb_2__7_"  given="sb_9_"  />
+	<module_name default="sb_2__8_"  given="sb_10_" />
+</module_names>

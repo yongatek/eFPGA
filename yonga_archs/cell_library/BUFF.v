@@ -1,12 +1,13 @@
-module INV(I, ZN);
+module BUFF(I, Z);
   input I;
-  output ZN;
+  output Z;
 
-  assign ZN = ~I;
+  assign Z = I;
 
   specify
     specparam tpd = 0.01;
-    (I => ZN) = tpd;
+    (I => Z) = tpd;
   endspecify
 
 endmodule
+

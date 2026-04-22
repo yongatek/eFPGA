@@ -1,13 +1,13 @@
-module DFFRQ (RST, CK, D, Q);
-  input RST; 
-  input CK; 
+module DFFRQ (CDN, CP, D, Q);
+  input CDN; 
+  input CP; 
   input D;  
   output Q;
   
   reg q_reg;
 
-  always @ (posedge CK or negedge RST)
-    if (~RST) begin
+  always @ (posedge CP or negedge CDN)
+    if (~CDN) begin
       q_reg <= 1'b0;
     end else begin
       q_reg <= D;
