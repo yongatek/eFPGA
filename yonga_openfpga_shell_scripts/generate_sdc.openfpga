@@ -24,7 +24,7 @@ ${OPENFPGA_PB_PIN_FIXUP_COMMAND}
 # Build the module graph
 #  - Enabled compression on routing architecture modules
 #  - Enable pin duplication on grid modules --group_config_block ${OPENFPGA_GROUP_TILE_CONFIG_OPTION} 
-build_fabric --compress_routing #--write_fabric_key ${OPENFPGA_VERILOG_OUTPUT_DIR}/fabric_key.xml #--verbose
+build_fabric --compress_routing --group_config_block 
 
 ${OPENFPGA_ADD_FPGA_CORE_MODULE}
 
