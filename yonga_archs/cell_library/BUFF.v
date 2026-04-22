@@ -1,4 +1,4 @@
-module BUF(I, Z);
+module BUFF(I, Z);
   input I;
   output Z;
 

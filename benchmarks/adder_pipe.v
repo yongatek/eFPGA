@@ -1,6 +1,6 @@
 module  adder_pipe
 #(
-    parameter width = 4) (
+    parameter width = 1) (
     input clk,
     input Reset,
     input [width-1:0] a_i,

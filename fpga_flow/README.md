@@ -1,5 +1,5 @@
 ## This script runs fpga tasks and automates some of the steps
-All FPGA tasks can be be run by executing the command 
+All FPGA tasks can be run by executing the command 
 
 ```sh
 python3 fpga_task.py
@@ -39,7 +39,7 @@ Other names for the reset signal are not recognized and are treated as general i
 
 - Pin constraints should be placed in ```../pin_constraints```
 	- For both of these the file name has to match the top module
-	- If no matching PCF file is found, one is automatically generated using the order which the pins where specified in.
+	- If no matching PCF file is found, one is automatically generated using the order in which the pins where declared.
 	- Not setting the PCF leaves this to VPR, which is mostly random
 
 - When changing the architecture the yosys synthesis script should be adjusted accordingly (task.conf and yosys_dep files used)

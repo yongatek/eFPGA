@@ -2,7 +2,7 @@
 # Module:       Flist Parser for TRISTAN eFPGA
 # Company:      Yongatek Microelectronics
 # Author:       Ugur Nezir
-# Version:      0.1.0
+# Version:      1.0.0
 # Description:  A helper script to update OpenFPGA-generated
 #               fabric flist based on the Verilator Component
 #               Parser modifications.

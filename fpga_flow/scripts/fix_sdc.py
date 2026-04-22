@@ -2,7 +2,7 @@
 # Module:       SDC File Generation and Fixer
 # Company:      Yongatek Microelectronics
 # Author:       Ahmad Houraniah
-# Version:      0.1.0
+# Version:      1.0.0
 # Description:  This module handles the generation and modification 
 #               of Synopsys Design Constraints (SDC) files for FPGA
 #               fabric timing analysis. It processes tile-based designs 
@@ -15,13 +15,14 @@ import os
 import re
 from typing import Dict, List, Tuple, Optional
 from pathlib import Path
-
+import xml.etree.ElementTree as ET
 
 # Constants
 FABRIC_PATH = '../yonga_archs/Fabric'
 TILE_PATH = f'{FABRIC_PATH}/SRC/tile'
 SDC_DIR = Path("../yonga_archs/Fabric/tile_SDC")
 FPGA_TOP_PREFIX = 'fpga_top/'
+FPGA_WRAPPER_PREFIX = 'fpga_core/'
 CREATE_CLOCK_KEYWORD = 'create_clock'
 
 def extract_module_instances(text: str, pattern: str) :
@@ -65,14 +66,14 @@ def get_submodules():
 
     # Define all patterns to search for in the file
     patterns = [
-        (r"sb_(?P<X>\d+)__(?P<Y>\d+)_ sb", lambda x, y: f"sb_{x}__{y}_"),
-        (r"cbx_(?P<X>\d+)__(?P<Y>\d+)_ cbx", lambda x, y: f"cbx_{x}__{y}_"),
-        (r"cby_(?P<X>\d+)__(?P<Y>\d+)_ cby", lambda x, y: f"cby_{x}__{y}_"),
+        ( r"sb_(?P<X>\d+)_ sb", lambda  x:   f"sb_{x}_"),
+        (r"cbx_(?P<X>\d+)_ cbx", lambda x: f"cbx_{x}_"),
+        (r"cby_(?P<X>\d+)_ cby", lambda x: f"cby_{x}_"),
         (r"grid_io_side_t ", lambda *_: "grid_io_side_t"),
         (r"grid_io_side_r ", lambda *_: "grid_io_side_r"),
         (r"grid_io_side_l ", lambda *_: "grid_io_side_l"),
         (r"grid_io_side_b ", lambda *_: "grid_io_side_b"),
-        (r"grid_mult_18 ", lambda *_: "grid_mult_18"),
+        (r"grid_mult_16 ", lambda *_: "grid_mult_16"),
         (r"grid_memory ", lambda *_: "grid_memory"),
         (r"grid_clb ", lambda *_: "grid_clb"),
     ]
@@ -103,7 +104,7 @@ def get_submodules():
                 if isinstance(match, tuple):
                     sub_modules[tile_name].append(formatter(*match))
                 else:
-                    sub_modules[tile_name].append(formatter())
+                    sub_modules[tile_name].append(formatter(match))
 
         # Extract submodule instances
         with open(tile_path, 'r') as file:
@@ -146,11 +147,11 @@ def create_sdc(tile_name, submodules, freq):
                 _write_sdc_files(temp_sdc, sdc_dir, sdc_files['mult'])
 
             elif 'clb' in module:
-                _write_clock_constraints(temp_sdc, 'clb', freq[0])
+                _write_clock_constraints(temp_sdc, 'grid_clb', freq[0])
                 _write_sdc_files(temp_sdc, sdc_dir, sdc_files['clb'])
 
             elif 'memory' in module:
-                _write_clock_constraints(temp_sdc, 'memory', freq[0])
+                _write_clock_constraints(temp_sdc, 'grid_memory', freq[0])
                 _write_sdc_files(temp_sdc, sdc_dir, sdc_files['memory'])
 
             else:
@@ -178,43 +179,51 @@ def _write_file_contents(output_file, file_path):
 def _write_clock_constraints(output_file, module_type, period):
     """Write clock constraints for a specific module type."""
     output_file.write("################################### Operation Clocks constraints ###################################\n")
-    output_file.write(f"create_clock -name {module_type}_left_width_0_height_0_subtile_0__pin_clk_0_ -period {period} \
-                        [get_ports {module_type}_left_width_0_height_0_subtile_0__pin_clk_0_]\n")
+    output_file.write(f"# create_clock -name {module_type}_left_right_width_0_height_0_subtile_0__pin_clk_0_ -period {period} \
+                        # [get_ports {module_type}_left_right_width_0_height_0_subtile_0__pin_clk_0_]\n")
     output_file.write("####################################################################################################\n")
 
 def _fix_sdc_paths(temp_path, final_path):
     """Fix incorrect paths in the temporary SDC file and write to the final SDC file."""
     path_replacements = [
+
+        (r"logical_tile_clb_mode_default__fle_mode_physical__fabric_mode_default__adder_2/"
+        r"logical_tile_clb_mode_default__fle_mode_physical__fabric_mode_default__adder",
+        "logical_tile_clb_mode_default__fle_mode_physical__fabric_mode_default__adder_0"),
+
         (r"logical_tile_clb_mode_default__fle_mode_physical__fabric_mode_default__frac_logic_mode_default__carry_follower_1/"
          r"logical_tile_clb_mode_default__fle_mode_physical__fabric_mode_default__frac_logic_mode_default__carry_follower",
          "logical_tile_clb_mode_default__fle_mode_physical__fabric_mode_default__frac_logic_mode_default__carry_follower_0"),
 
-        (r"logical_tile_mult_18_mode_mult_8x8__mult_8x8_slice_mode_default__mult_8x8/"
-         r"logical_tile_mult_18_mode_mult_8x8__mult_8x8_slice_mode_default__mult_8x8/",
-         "logical_tile_mult_18_mode_mult_8x8__mult_8x8_slice_mode_default__mult_8x8_0/"),
+        (r"logical_tile_mult_16_mode_mult_16x16__mult_16x16_slice_mode_default__mult_16x16/"
+         r"logical_tile_mult_16_mode_mult_16x16__mult_16x16_slice_mode_default__mult_16x16/",
+         "logical_tile_mult_16_mode_mult_16x16__mult_16x16_slice_mode_default__mult_16x16_0/"),
 
-        (r"logical_tile_mult_18_mode_mult_8x8__mult_8x8_slice_mode_default__mult_8x8_0/"
-         r"logical_tile_mult_18_mode_mult_8x8__mult_8x8_slice_mode_default__mult_8x8/",
-         "logical_tile_mult_18_mode_mult_8x8__mult_8x8_slice_mode_default__mult_8x8_0/")
+        (r"logical_tile_mult_16_mode_mult_16x16__mult_16x16_slice_mode_default__mult_16x16_0/"
+         r"logical_tile_mult_16_mode_mult_16x16__mult_16x16_slice_mode_default__mult_16x16/",
+         "logical_tile_mult_16_mode_mult_16x16__mult_16x16_slice_mode_default__mult_16x16_0/")
     ]
 
     with open(temp_path, 'r') as temp_file, open(final_path, 'w') as final_file:
         for line in temp_file:
             for pattern, replacement in path_replacements:
                 line = re.sub(pattern, replacement, line)
-            final_file.write(line)
+            if("#	Date" not in line and "set_disable_timing" not in line):
+                final_file.write(line)
 
 def generate_clock_constraint(freq: int) -> str:
     """Generate the programming clock constraint string."""
     return f"""
 ################################### Programming clock Constraint ###################################
-create_clock -name prog_clk -period {str(freq)} [get_ports prog_clk]
+# create_clock -name prog_clk -period {str(freq)} [get_ports prog_clk]
 ####################################################################################################\n"""
 
-def process_constraint_line(line: str, tile_mappings: zip) -> str:
+def process_constraint_line(line: str, tile_mappings: list) -> str:
     """Process a single constraint line with replacements."""
     if CREATE_CLOCK_KEYWORD not in line:
         line = line.replace(FPGA_TOP_PREFIX, '')
+        line = line.replace(FPGA_WRAPPER_PREFIX, '')
+        line = line.replace('grid_clb_left', 'grid_clb')
         for orig, new in tile_mappings:
             line = line.replace(orig, new)
     return line
@@ -250,10 +259,10 @@ def fix_sdc_paths(
                 constraints = f.readlines()
 
             # Create mapping pairs for replacement
-            tile_mappings = zip(
+            tile_mappings = list(zip(
                 submodules[tile_name], 
                 sub_modules_instances[tile_name]
-            )
+            ))
 
             # Process each constraint line
             new_constraints = [
@@ -273,11 +282,30 @@ def fix_sdc_paths(
         print(f"Invalid tile mapping: {e}")
         raise
 
+def get_rename_file():
+    with open('config/task.conf', 'r') as f:
+        config_lines = f.readlines()
+    for line in config_lines:
+        if "openfpga_rename_routing_file" in line:
+            return f"../yonga_archs/{line.split('yonga_archs/')[-1].strip()}"
+
+def rename_routing_modules(given_names):
+    file_path = get_rename_file()    
+    tree = ET.parse(file_path)
+    mapping = {n.get('given'): n.get('default') for n in tree.findall('module_name')}    
+
+    updated_submodules = {}
+
+    for tile, module_list in given_names.items():
+        updated_submodules[tile] = [mapping.get(mod, mod) for mod in module_list]
+    return updated_submodules
+
 def generate_tile_based_sdcs(freq: Tuple[int, int, int]) -> None:
     """
     Generate tile-based SDC files with timing constraints.
     """
-    submodules, sub_modules_instances = get_submodules()
+    submodules_new, sub_modules_instances = get_submodules()
+    submodules = rename_routing_modules(submodules_new)
     if not submodules or not sub_modules_instances:
         print("Failed to get submodules")
         return

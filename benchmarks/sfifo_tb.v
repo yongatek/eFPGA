@@ -5,13 +5,13 @@ module tb();
   wire [7:0] data_out;
   wire full, empty;
   
-  sfifo_top_formal_verification sfifo_top_formal_verification 
+  sfifo sfifo_top_formal_verification 
   		(.clk(clk),  .reset(reset), .w_en(w_en), .r_en(r_en), .data_in(data_in), .data_out(data_out), .full(full), .empty(empty));
-  initial begin
+/*  initial begin
 	$dumpfile("sfifo_tb.vcd");
 	$dumpvars(1, tb);
   end
-  initial begin
+*/  initial begin
 	  clk = 0;
 	  reset = 1;
 	  

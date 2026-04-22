@@ -12,22 +12,18 @@
         <port name="sumout"/>
       </output_ports>
     </model>
-    <model name="dual_port_ram">
+    <model name="single_port_ram">
       <input_ports>
-        <port name="addr1" clock="clk"/>
-        <port name="d_in1" clock="clk"/>
-        <port name="wen1" clock="clk"/>
-        <port name="addr2" clock="clk"/>
-        <port name="d_in2" clock="clk"/>
-        <port name="wen2" clock="clk"/>
+        <port name="addr" clock="clk"/>
+        <port name="d_in" clock="clk"/>
+        <port name="wen" clock="clk"/>
         <port name="clk" is_clock="1"/>
       </input_ports>
       <output_ports>
-        <port name="d_out1" clock="clk"/>
-        <port name="d_out2" clock="clk"/>
+        <port name="d_out" clock="clk"/>
       </output_ports>
    </model>
-    <model name="mult_8">
+    <model name="mult_16">
       <input_ports>
       	<port name="sign" combinational_sink_ports="Y"/>
         <port name="A" combinational_sink_ports="Y"/>
@@ -66,34 +62,8 @@
     </model>
   </models>
   <tiles>
-    <tile name="io_top" area="0">
-      <sub_tile name="io_top" capacity="8">
-        <equivalent_sites>
-          <site pb_type="io"/>
-        </equivalent_sites>
-        <input name="outpad" num_pins="1"/>
-        <output name="inpad" num_pins="1"/>
-        <fc in_type="frac" in_val="0.15" out_type="frac" out_val="0.10"/>
-        <pinlocations pattern="custom">
-          <loc side="bottom">io_top.outpad io_top.inpad</loc>
-        </pinlocations>
-      </sub_tile>
-    </tile>
-    <tile name="io_right" area="0">
-      <sub_tile name="io_right" capacity="8">
-        <equivalent_sites>
-          <site pb_type="io"/>
-        </equivalent_sites>
-        <input name="outpad" num_pins="1"/>
-        <output name="inpad" num_pins="1"/>
-        <fc in_type="frac" in_val="0.15" out_type="frac" out_val="0.10"/>
-        <pinlocations pattern="custom">
-          <loc side="left">io_right.outpad io_right.inpad</loc>
-        </pinlocations>
-      </sub_tile>
-    </tile>
     <tile name="io_bottom" area="0">
-      <sub_tile name="io_bottom" capacity="2">
+      <sub_tile name="io_bottom" capacity="13">
         <equivalent_sites>
           <site pb_type="io"/>
         </equivalent_sites>
@@ -102,46 +72,6 @@
         <fc in_type="frac" in_val="0.15" out_type="frac" out_val="0.10"/>
         <pinlocations pattern="custom">
           <loc side="top">io_bottom.outpad io_bottom.inpad</loc>
-        </pinlocations>
-      </sub_tile>
-    </tile>
-    
-    <tile name="io_bottom_empty_1" area="0">
-      <sub_tile name="io_bottom" capacity="1">
-        <equivalent_sites>
-          <site pb_type="io"/>
-        </equivalent_sites>
-        <input name="outpad" num_pins="1"/>
-        <output name="inpad" num_pins="1"/>
-        <fc in_type="frac" in_val="0.15" out_type="frac" out_val="0.10"/>
-        <pinlocations pattern="custom">
-          <loc side="top">io_bottom.outpad io_bottom.inpad</loc>
-        </pinlocations>
-      </sub_tile>
-    </tile>
-    <tile name="io_bottom_empty_2" area="0">
-      <sub_tile name="io_bottom" capacity="2">
-        <equivalent_sites>
-          <site pb_type="io"/>
-        </equivalent_sites>
-        <input name="outpad" num_pins="1"/>
-        <output name="inpad" num_pins="1"/>
-        <fc in_type="frac" in_val="0.15" out_type="frac" out_val="0.10"/>
-        <pinlocations pattern="custom">
-          <loc side="top">io_bottom.outpad io_bottom.inpad</loc>
-        </pinlocations>
-      </sub_tile>
-    </tile>
-    <tile name="io_left" area="0">
-      <sub_tile name="io_left" capacity="1">
-        <equivalent_sites>
-          <site pb_type="io"/>
-        </equivalent_sites>
-        <input name="outpad" num_pins="1"/>
-        <output name="inpad" num_pins="1"/>
-        <fc in_type="frac" in_val="0.15" out_type="frac" out_val="0.10"/>
-        <pinlocations pattern="custom">
-          <loc side="right">io_left.outpad io_left.inpad</loc>
         </pinlocations>
       </sub_tile>
     </tile>
@@ -150,14 +80,10 @@
         <equivalent_sites>
           <site pb_type="memory"/>
         </equivalent_sites>
-        <input name="addr1" num_pins="10"/>
-        <input name="addr2" num_pins="10"/>
-        <input name="d_in1" num_pins="8"/>
-        <input name="d_in2" num_pins="8"/>
-        <input name="wen1" num_pins="1"/>
-        <input name="wen2" num_pins="1"/>
-        <output name="d_out1" num_pins="8"/>
-        <output name="d_out2" num_pins="8"/>
+        <input name="addr" num_pins="10"/>
+        <input name="d_in" num_pins="8"/>
+        <input name="wen" num_pins="1"/>
+        <output name="d_out" num_pins="8"/>
         <clock name="clk" num_pins="1"/>
         <fc in_type="frac" in_val="0.15" out_type="frac" out_val="0.10">
           <fc_override port_name="clk" fc_type="frac" fc_val="0"/>
@@ -165,8 +91,9 @@
         <pinlocations pattern="custom">
           <loc side="left">  </loc>
           <loc side="top"> </loc>
-          <loc side="right"> </loc>
-          <loc side="bottom"> memory.clk[0:0]  memory.wen1  memory.wen2  memory.d_out1[0:7] memory.d_in2[0:7] memory.addr2[0:9]  memory.d_in1[0:7] memory.addr1[0:9]  memory.d_out2[0:7]</loc>
+          <loc side="right"> memory.wen memory.d_out[7:0] </loc>
+          <loc side="bottom" xoffset="0"> memory.d_in[7:0] memory.clk[0:0]     </loc>
+          <loc side="bottom" xoffset="1">  memory.addr[9:0] </loc>
         </pinlocations>
       </sub_tile>
     </tile>
@@ -188,28 +115,55 @@
           <fc_override port_name="reset" fc_type="frac" fc_val="0"/>
         </fc>
         <pinlocations pattern="custom">
-          <loc side="left"></loc>
+          <loc side="left"> clb.cout </loc>
           <loc side="top"> </loc>
-          <loc side="right"></loc>
-          <loc side="bottom">clb.clk[0:0] clb.reset clb.cin clb.O[0:5] clb.I clb.O[6:9]  clb.cout clb.O[10:15]</loc>
+          <loc side="right"> clb.I[15:0] clb.O[15:0] clb.cin </loc>
+          <loc side="bottom"> clb.clk clb.reset clb.I[31:16] </loc>
         </pinlocations>
       </sub_tile>
     </tile>
-    <tile name="mult_8" height="1" width="1" area="396000">
-      <sub_tile name="mult_8">
+
+    <tile name="clb_left" area="53894">
+      <sub_tile name="clb">
         <equivalent_sites>
-          <site pb_type="mult_8" pin_mapping="direct"/>
+          <site pb_type="clb"/>
+        </equivalent_sites>
+        <input name="I" num_pins="32" equivalent="none"/>
+        <input name="cin" num_pins="1"/>
+        <input name="reset" num_pins="1" is_non_clock_global="true"/>
+        <output name="O" num_pins="16" equivalent="none"/>
+        <output name="cout" num_pins="1"/>
+        <clock name="clk" num_pins="1"/>
+        <fc in_type="frac" in_val="0.15" out_type="frac" out_val="0.10">
+          <fc_override port_name="cin" fc_type="frac" fc_val="0"/>
+          <fc_override port_name="cout" fc_type="frac" fc_val="0"/>
+          <fc_override port_name="clk" fc_type="frac" fc_val="0"/>
+          <fc_override port_name="reset" fc_type="frac" fc_val="0"/>
+        </fc>
+        <pinlocations pattern="custom">
+          <loc side="left">  </loc>
+          <loc side="top">  </loc>
+          <loc side="right"> clb.cout clb.clk clb.reset clb.I[31:0] clb.O[15:0] clb.cin </loc>
+          <loc side="bottom"> </loc>
+        </pinlocations>
+      </sub_tile>
+    </tile>
+
+    <tile name="mult_16" height="1" width="1" area="396000">
+      <sub_tile name="mult_16">
+        <equivalent_sites>
+          <site pb_type="mult_16" pin_mapping="direct"/>
         </equivalent_sites>
         <input name="sign" num_pins="1"/>
-        <input name="a" num_pins="8"/>
-        <input name="b" num_pins="8"/>
-        <output name="out" num_pins="16"/>
+        <input name="a" num_pins="16"/>
+        <input name="b" num_pins="16"/>
+        <output name="out" num_pins="32"/>
         <fc in_type="frac" in_val="0.15" out_type="frac" out_val="0.10"/>
         <pinlocations pattern="custom">
           <loc side="left"> </loc>
           <loc side="top"> </loc>
-          <loc side="right">   </loc>
-          <loc side="bottom"> mult_8.sign[0:0] mult_8.a[0:7]  mult_8.b[0:7] mult_8.out[0:15] </loc>
+          <loc side="right">  mult_16.a[15:11] mult_16.b[15:11] mult_16.sign[0:0]  mult_16.out[31:0]</loc>
+          <loc side="bottom"> mult_16.b[10:0] mult_16.a[10:0]  </loc>
         </pinlocations>
       </sub_tile>
     </tile>
@@ -222,7 +176,7 @@
       <col type="io_right" startx="W-1" priority="100"/>
       <corners type="EMPTY" priority="101"/>
       <fill type="clb" priority="10"/>
-      <col type="mult_8" startx="2" starty="1" repeatx="8" priority="20"/>
+      <col type="mult_16" startx="2" starty="1" repeatx="8" priority="20"/>
     </auto_layout>
 
     <fixed_layout name="8x8" width="8" height="8">
@@ -232,19 +186,20 @@
       <col type="io_right" startx="W-1" priority="100"/>
       <corners type="EMPTY" priority="101"/>
       <fill type="clb" priority="10"/>
-      <col type="mult_8" startx="2" starty="1" priority="20"/>
+      <col type="mult_16" startx="2" starty="1" priority="20"/>
       <col type="memory" startx="5" starty="1" priority="20"/>
     </fixed_layout>
 
     <fixed_layout name="10x10" width="10" height="10">
+      <corners type="EMPTY" priority="101"/>
       <row type="io_top" starty="H-1" priority="100"/>
       <row type="io_bottom" starty="0" priority="100"/>
       <col type="io_left" startx="0" priority="100"/>
       <col type="io_right" startx="W-1" priority="100"/>
-      <corners type="EMPTY" priority="101"/>
+      <col type="clb" startx="W-2" priority="90"/>
       <fill type="clb" priority="10"/>
-      <col type="mult_8" startx="2" starty="1" priority="20"/>
-      <col type="memory" startx="7" starty="1" priority="20"/>
+      <row type="mult_16" starty="3" startx="2" priority="20"/>
+      <row type="memory" starty="6" startx="2" priority="20"/>
     </fixed_layout>
 
     <fixed_layout name="12x12" width="12" height="12">
@@ -254,8 +209,8 @@
       <col type="io_right" startx="W-1" priority="100"/>
       <corners type="EMPTY" priority="101"/>
       <fill type="clb" priority="10"/>
-      <col type="mult_8" startx="9" starty="1" priority="20"/>
-      <col type="mult_8" startx="2" starty="1" priority="20"/>
+      <col type="mult_16" startx="9" starty="1" priority="20"/>
+      <col type="mult_16" startx="2" starty="1" priority="20"/>
       <col type="memory" startx="4" starty="1" priority="20"/>
       <col type="memory" startx="7" starty="1" priority="20"/>
     </fixed_layout>
@@ -266,7 +221,7 @@
       <col type="io_right" startx="W-1" priority="100"/>
       <corners type="EMPTY" priority="101"/>
       <fill type="clb" priority="10"/>
-      <col type="mult_8" startx="5" starty="1" priority="20"/>
+      <col type="mult_16" startx="5" starty="1" priority="20"/>
       <col type="memory" startx="12" starty="1" priority="20"/>
     </fixed_layout>
     <fixed_layout name="18x10" width="20" height="12">
@@ -276,7 +231,7 @@
       <col type="io_right" startx="W-1" priority="100"/>
       <corners type="EMPTY" priority="101"/>
       <fill type="clb" priority="10"/>
-      <row type="mult_8" starty="3" startx="1" priority="20"/>
+      <row type="mult_16" starty="3" startx="1" priority="20"/>
       <row type="memory" starty="8" startx="1" priority="20"/>
     </fixed_layout>
     <fixed_layout name="18x18" width="18" height="18">
@@ -286,21 +241,60 @@
       <col type="io_right" startx="W-1" priority="100"/>
       <corners type="EMPTY" priority="101"/>
       <fill type="clb" priority="10"/>
-      <col type="mult_8" startx="5" starty="1" priority="20"/>
+      <col type="mult_16" startx="5" starty="1" priority="20"/>
       <col type="memory" startx="12" starty="1" priority="20"/>
     </fixed_layout>
-	
+    <fixed_layout name="14x21" width="14" height="21">
+      <corners type="EMPTY" priority="101"/>
+      <col type="EMPTY" startx="0" starty="1" priority="100"/>
+      <col type="EMPTY" startx="W-1" starty="1" priority="100"/>
+      <row type="EMPTY" starty="H-1" priority="100"/>
+      <row type="io_bottom" starty="0" priority="100"/>
+      <col type="clb" startx="W-2" priority="90"/>
+      <fill type="clb" priority="10"/>
+      <row type="mult_16" starty="4" startx="2" priority="20"/>
+      <row type="mult_16" starty="12" startx="2" priority="20"/>
+      <row type="memory" starty="8" startx="2" priority="20"/>
+      <row type="memory" starty="16" startx="2" priority="20"/>
+    </fixed_layout>
+
+    <fixed_layout name="13x21" width="13" height="21">
+      <corners type="EMPTY" priority="101"/>
+      <col type="clb_left" startx="0" starty="1" priority="100"/>
+      <col type="EMPTY" startx="W-1" starty="1" priority="100"/>
+      <row type="EMPTY" starty="H-1" priority="100"/>
+      <row type="io_bottom" starty="0" priority="100"/>
+      <col type="clb" startx="W-2" priority="90"/>
+      <fill type="clb" priority="10"/>
+      <row type="mult_16" starty="4" startx="1" priority="20"/>
+      <row type="mult_16" starty="12" startx="1" priority="20"/>
+      <row type="memory" starty="8" startx="1" priority="20"/>
+      <row type="memory" starty="16" startx="1" priority="20"/>
+    </fixed_layout>
+
+    <fixed_layout name="5x10" width="5" height="10">
+      <corners type="EMPTY" priority="101"/>
+      <col type="clb_left" startx="0" starty="1" priority="100"/>
+      <col type="EMPTY" startx="W-1" starty="1" priority="100"/>
+      <row type="EMPTY" starty="H-1" priority="100"/>
+      <row type="io_bottom" starty="0" priority="100"/>
+      <col type="clb" startx="W-2" priority="90"/>
+      <fill type="clb" priority="10"/>
+      <row type="mult_16" starty="3" startx="1" priority="20"/>
+      <row type="memory" starty="6" startx="1" priority="20"/>
+    </fixed_layout>
+
     <fixed_layout name="20x20" width="20" height="20">
       <corners type="EMPTY" priority="101"/>
+      <col type="EMPTY" startx="0" starty="1" priority="100"/>
+      <col type="EMPTY" startx="W-1" starty="1" priority="100"/>
       <row type="EMPTY" starty="H-1" priority="100"/>
-      <col type="EMPTY" startx="0" priority="100"/>
-      <col type="io_right" startx="W-1" priority="100"/>
+      <row type="io_bottom" starty="0" priority="100"/>
       <col type="clb" startx="W-2" priority="90"/>
-      <row type="EMPTY" starty="0" priority="100"/>
       <fill type="clb" priority="10"/>
-      <row type="mult_8" starty="10" startx="1" priority="20"/>
-      <row type="memory" starty="5" startx="1" priority="20"/>
-      <row type="memory" starty="15" startx="1" priority="20"/>
+      <row type="mult_16" starty="10" startx="2" priority="20"/>
+      <row type="memory" starty="5" startx="2" priority="20"/>
+      <row type="memory" starty="15" startx="2" priority="20"/>
     </fixed_layout>
 
     <fixed_layout name="108x108" width="108" height="108">
@@ -311,12 +305,12 @@
       <col type="clb" startx="W-2" priority="100"/>
       <row type="EMPTY" starty="0" priority="100"/>
       <fill type="clb" priority="10"/>
-      <row type="mult_8" starty="10" startx="1" priority="20"/>
-      <row type="mult_8" starty="32" startx="1" priority="20"/>  
+      <row type="mult_16" starty="10" startx="1" priority="20"/>
+      <row type="mult_16" starty="32" startx="1" priority="20"/>  
       <row type="memory" starty="21" startx="1" priority="20"/>           
       <row type="memory" starty="43" startx="1" priority="20"/>
-      <row type="mult_8" starty="75" startx="1" priority="20"/>
-      <row type="mult_8" starty="97" startx="1" priority="20"/>  
+      <row type="mult_16" starty="75" startx="1" priority="20"/>
+      <row type="mult_16" starty="97" startx="1" priority="20"/>  
       <row type="memory" starty="64" startx="1" priority="20"/>           
       <row type="memory" starty="86" startx="1" priority="20"/>
     </fixed_layout>
@@ -344,12 +338,12 @@
       <sb type="pattern">1 1</sb>
       <cb type="pattern">1</cb>
     </segment>
-    <segment name="L2" freq="0.85" length="2" type="unidir" Rmetal="101" Cmetal="22.5e-15">
+    <segment name="L2" freq="0.75" length="2" type="unidir" Rmetal="101" Cmetal="22.5e-15">
       <mux name="L2_mux"/>
       <sb type="pattern">1 1 1</sb>
       <cb type="pattern">1 1</cb>
     </segment>
-    <segment name="L4" freq="0.05" length="4" type="unidir" Rmetal="101" Cmetal="22.5e-15">
+    <segment name="L4" freq="0.15" length="4" type="unidir" Rmetal="101" Cmetal="22.5e-15">
       <mux name="L4_mux"/>
       <sb type="pattern">1 1 1 1 1</sb>
       <cb type="pattern">1 1 1 1</cb>
@@ -361,7 +355,7 @@
     </segment>
   </segmentlist>
   <directlist>
-    <direct name="adder_carry" from_pin="clb.cout" to_pin="clb.cin" x_offset="0" y_offset="-1" z_offset="0"/>
+    <direct name="adder_carry" from_pin="clb.cout" to_pin="clb.cin" x_offset="-1" y_offset="0" z_offset="0"/>
   </directlist>
   <complexblocklist>
     <pb_type name="io">
@@ -684,34 +678,34 @@
         </direct>
       </interconnect>
     </pb_type>
-    <pb_type name="mult_8">
+    <pb_type name="mult_16">
     	<input name="sign" num_pins="1"/>
-      <input name="a" num_pins="8"/>
-      <input name="b" num_pins="8"/>
-      <output name="out" num_pins="16"/>
-      <mode name="mult_8x8">
-        <pb_type name="mult_8x8_slice" num_pb="1">
+      <input name="a" num_pins="16"/>
+      <input name="b" num_pins="16"/>
+      <output name="out" num_pins="32"/>
+      <mode name="mult_16x16">
+        <pb_type name="mult_16x16_slice" num_pb="1">
         	<input name="sign_cfg" num_pins="1"/>
-          <input name="A_cfg" num_pins="8"/>
-          <input name="B_cfg" num_pins="8"/>
-          <output name="OUT_cfg" num_pins="16"/>
-          <pb_type name="mult_8x8" blif_model=".subckt mult_8" num_pb="1">
+          <input name="A_cfg" num_pins="16"/>
+          <input name="B_cfg" num_pins="16"/>
+          <output name="OUT_cfg" num_pins="32"/>
+          <pb_type name="mult_16x16" blif_model=".subckt mult_16" num_pb="1">
             <input name="sign" num_pins="1"/>
-            <input name="A" num_pins="8"/>
-            <input name="B" num_pins="8"/>
-            <output name="Y" num_pins="16"/>
-            <delay_constant max="${MULT_DELAY}" in_port="mult_8x8.sign" out_port="mult_8x8.Y"/>
-            <delay_constant max="${MULT_DELAY}" in_port="mult_8x8.A" out_port="mult_8x8.Y"/>
-            <delay_constant max="${MULT_DELAY}" in_port="mult_8x8.B" out_port="mult_8x8.Y"/>
+            <input name="A" num_pins="16"/>
+            <input name="B" num_pins="16"/>
+            <output name="Y" num_pins="32"/>
+            <delay_constant max="${MULT_DELAY}" in_port="mult_16x16.sign" out_port="mult_16x16.Y"/>
+            <delay_constant max="${MULT_DELAY}" in_port="mult_16x16.A" out_port="mult_16x16.Y"/>
+            <delay_constant max="${MULT_DELAY}" in_port="mult_16x16.B" out_port="mult_16x16.Y"/>
           </pb_type>
           <interconnect>
-            <direct name="sign2sign" input="mult_8x8_slice.sign_cfg" output="mult_8x8.sign">
+            <direct name="sign2sign" input="mult_16x16_slice.sign_cfg" output="mult_16x16.sign">
             </direct>
-            <direct name="a2a" input="mult_8x8_slice.A_cfg" output="mult_8x8.A">
+            <direct name="a2a" input="mult_16x16_slice.A_cfg" output="mult_16x16.A">
             </direct>
-            <direct name="b2b" input="mult_8x8_slice.B_cfg" output="mult_8x8.B">
+            <direct name="b2b" input="mult_16x16_slice.B_cfg" output="mult_16x16.B">
             </direct>
-            <direct name="out2out" input="mult_8x8.Y" output="mult_8x8_slice.OUT_cfg">
+            <direct name="out2out" input="mult_16x16.Y" output="mult_16x16_slice.OUT_cfg">
             </direct>
           </interconnect>
           <power method="pin-toggle">
@@ -722,70 +716,50 @@
           </power>
         </pb_type>
         <interconnect>
-          <direct name="sign2sign" input="mult_8.sign" output="mult_8x8_slice.sign_cfg">
+          <direct name="sign2sign" input="mult_16.sign" output="mult_16x16_slice.sign_cfg">
           </direct>
-          <direct name="a2a" input="mult_8.a" output="mult_8x8_slice.A_cfg">
+          <direct name="a2a" input="mult_16.a" output="mult_16x16_slice.A_cfg">
           </direct>
-          <direct name="b2b" input="mult_8.b" output="mult_8x8_slice.B_cfg">
+          <direct name="b2b" input="mult_16.b" output="mult_16x16_slice.B_cfg">
           </direct>
-          <direct name="out2out" input="mult_8x8_slice.OUT_cfg" output="mult_8.out">
+          <direct name="out2out" input="mult_16x16_slice.OUT_cfg" output="mult_16.out">
           </direct>
         </interconnect>
       </mode>
       <power method="sum-of-children"/>
     </pb_type>
     <pb_type name="memory">
-      <input name="addr1" num_pins="10"/>
-      <input name="addr2" num_pins="10"/>
-      <input name="d_in1" num_pins="8"/>
-      <input name="d_in2" num_pins="8"/>
-      <input name="wen1" num_pins="1"/>
-      <input name="wen2" num_pins="1"/>
-      <output name="d_out1" num_pins="8"/>
-      <output name="d_out2" num_pins="8"/>
+      <input name="addr" num_pins="10"/>
+      <input name="d_in" num_pins="8"/>
+      <input name="wen" num_pins="1"/>
+      <output name="d_out" num_pins="8"/>
       <clock name="clk" num_pins="1"/>
-      <mode name="mem_1024x8_dp">
-        <pb_type name="mem_1024x8_dp" blif_model=".subckt dual_port_ram" num_pb="1">
-          <input name="addr1" num_pins="10" port_class="address1"/>
-          <input name="addr2" num_pins="10" port_class="address2"/>
-          <input name="d_in1" num_pins="8" port_class="data_in1"/>
-          <input name="d_in2" num_pins="8" port_class="data_in2"/>
-          <input name="wen1" num_pins="1" port_class="write_en1"/>
-          <input name="wen2" num_pins="1" port_class="write_en2"/>
-          <output name="d_out1" num_pins="8" port_class="data_out1"/>
-          <output name="d_out2" num_pins="8" port_class="data_out2"/>
+      <mode name="mem_1024x8_sp">
+        <pb_type name="mem_1024x8_sp" blif_model=".subckt single_port_ram" num_pb="1">
+          <input name="addr" num_pins="10" port_class="address1"/>
+          <input name="d_in" num_pins="8" port_class="data_in"/>
+          <input name="wen" num_pins="1" port_class="write_en"/>
+          <output name="d_out" num_pins="8" port_class="data_out"/>
           <clock name="clk" num_pins="1" port_class="clock"/>
-          <T_setup value="${BRAM_ADDR_T_SETUP}" port="mem_1024x8_dp.addr1" clock="clk"/>
-          <T_setup value="${BRAM_ADDR_T_SETUP}" port="mem_1024x8_dp.addr2" clock="clk"/>
-          <T_setup value="${BRAM_DIN_T_SETUP}" port="mem_1024x8_dp.d_in1" clock="clk"/>
-          <T_setup value="${BRAM_DIN_T_SETUP}" port="mem_1024x8_dp.d_in2" clock="clk"/>
-          <T_setup value="${BRAM_WEN_T_SETUP}" port="mem_1024x8_dp.wen1" clock="clk"/>
-          <T_setup value="${BRAM_WEN_T_SETUP}" port="mem_1024x8_dp.wen2" clock="clk"/>
-          <T_clock_to_Q max="${BRAM_DOUT_T_CLK2Q}" port="mem_1024x8_dp.d_out1" clock="clk"/>
-          <T_clock_to_Q max="${BRAM_DOUT_T_CLK2Q}" port="mem_1024x8_dp.d_out2" clock="clk"/>
+          <T_setup value="${BRAM_ADDR_T_SETUP}" port="mem_1024x8_sp.addr" clock="clk"/>
+          <T_setup value="${BRAM_DIN_T_SETUP}" port="mem_1024x8_sp.d_in" clock="clk"/>
+          <T_setup value="${BRAM_WEN_T_SETUP}" port="mem_1024x8_sp.wen" clock="clk"/>
+          <T_clock_to_Q max="${BRAM_DOUT_T_CLK2Q}" port="mem_1024x8_sp.d_out" clock="clk"/>
           <power method="pin-toggle">
             <port name="clk" energy_per_toggle="17.9e-12"/>
             <static_power power_per_instance="0.0"/>
           </power>
         </pb_type>
         <interconnect>
-          <direct name="address1" input="memory.addr1" output="mem_1024x8_dp.addr1">
+          <direct name="address1" input="memory.addr" output="mem_1024x8_sp.addr">
           </direct>
-          <direct name="data_input1" input="memory.d_in1" output="mem_1024x8_dp.d_in1">
+          <direct name="data_input1" input="memory.d_in" output="mem_1024x8_sp.d_in">
           </direct>
-          <direct name="writeen1" input="memory.wen1" output="mem_1024x8_dp.wen1">
+          <direct name="writeen1" input="memory.wen" output="mem_1024x8_sp.wen">
           </direct>
-          <direct name="dataout1" input="mem_1024x8_dp.d_out1" output="memory.d_out1">
+          <direct name="dataout1" input="mem_1024x8_sp.d_out" output="memory.d_out">
           </direct>         
-          <direct name="clk_dir" input="memory.clk[0:0]" output=" mem_1024x8_dp.clk">
-          </direct>
-          <direct name="address2" input="memory.addr2" output="mem_1024x8_dp.addr2">
-          </direct>
-          <direct name="data_input2" input="memory.d_in2" output="mem_1024x8_dp.d_in2">
-          </direct>
-          <direct name="writeen2" input="memory.wen2" output="mem_1024x8_dp.wen2">
-          </direct>
-          <direct name="dataout2" input="mem_1024x8_dp.d_out2" output="memory.d_out2">
+          <direct name="clk_dir" input="memory.clk[0:0]" output=" mem_1024x8_sp.clk">
           </direct>
         </interconnect>
       </mode>

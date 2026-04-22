@@ -2,7 +2,7 @@
 # Module:       Include Parser for TRISTAN eFPGA
 # Company:      Yongatek Microelectronics
 # Author:       Ugur Nezir
-# Version:      0.2.1
+# Version:      1.0.0
 # Description:  A helper script to update OpenFPGA-generated
 #               fabric netlist based on the Verilator Component
 #               Parser modifications.
@@ -32,7 +32,7 @@ def modify_filenames(input_file, output_file, prefix, suffix):
 
 def modify_include_file(target_file_path, module_list_path):
     """
-    A variation of modify_filenames() function to be called from run_task.py script in TRISTAN eFPGA flow.
+    A variation of modify_filenames() function to be called from fpga_task.py script in TRISTAN eFPGA flow.
 
     Parameters:
     - target_file_path: Output file name which shall have the modified include statements replacing the original OpenFPGA generation.

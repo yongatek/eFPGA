@@ -2,7 +2,7 @@
 # Module:       Verilator Component Parser for TRISTAN eFPGA
 # Company:      Yongatek Microelectronics
 # Author:       Ugur Nezir
-# Version:      0.2.1
+# Version:      1.0.0
 # Description:  OpenFPGA generates several RTL files which
 #               contain multiple modules within a single source
 #               file. However, Verilator compiles designs that
@@ -119,15 +119,13 @@ def process_files(directory, component_break, file_types=None, debug=False):
                     if module_name in processed_modules:
                         if debug:
                             print(f"Module/Class {module_name} in {filename} has already been processed. Refer to {INDEX_FILE}.")
-                        module_name = None  # Reset module_name to avoid processing
+                        module_name = None  # GLOBAL_RESET module_name to avoid processing
                         buffer = ""
                         continue
                 if component_break in line:
                     if module_name:
                         new_filename = os.path.join(directory, f"{module_name}.v")
-                        if os.path.exists(new_filename):
-                            print(f"Error: File {new_filename} already exists.")
-                        else:
+                        if not os.path.exists(new_filename):
                             with open(new_filename, 'w') as new_file:
                                 new_file.write(buffer)
                             save_processed_module(module_name)

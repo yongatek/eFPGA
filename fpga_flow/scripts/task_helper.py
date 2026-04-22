@@ -1,4 +1,5 @@
 import os
+import json
 from scripts.paths import get_TRISTAN_EFPGA_PATH, get_fabric_path
 from scripts.rtl_parser import extract_variables_info
 
@@ -11,7 +12,7 @@ def write_clock_constraints(clocks_names, reset_flag):
         else:
             f.write(f"  <set_io pin=\"clk\" net=\"clk\"/>\n")
         if reset_flag:
-            f.write("  <set_io pin=\"Reset[0]\" net=\"Reset\"/>\n")
+            f.write("  <set_io pin=\"GLOBAL_RESET[0]\" net=\"GLOBAL_RESET\"/>\n")
         f.write("</pin_constraints>\n")
 
     with open("config/constraints/repack_design_constraints.xml", "w") as f:
@@ -30,7 +31,7 @@ import re
 def map_rst_and_clocks(benchmark):
     """
     This function is responsible for mapping a benchmark's clock and reset signals to the global pins.
-    It extracts the names of clock signals and checks if the global reset is used which must be called "Reset"
+    It extracts the names of clock signals and checks if the global reset is used which must be called "GLOBAL_RESET"
     """
     clocks_names=[]
     reset_flag=False
@@ -40,8 +41,8 @@ def map_rst_and_clocks(benchmark):
         if("module" in i and benchmark.get_name() in i): 
             top_module_flag = True
         if(top_module_flag): 
-            # If the global Reset pin is used  
-            if("Reset" in i): 
+            # If the global GLOBAL_RESET pin is used  
+            if("GLOBAL_RESET" in i): 
                 reset_flag=True
             # The loop below extracts the clock names
             if("clk" in i and "input" in i):
@@ -105,12 +106,13 @@ def generate_bus_group_file(benchmark):
     # Create bus group XML
     buses = "<bus_group>\n"
     for i in range(len(var_names)):
-        bus_endian = "false" if big_endian[i] == "false" else "true"
-        bus_range = f"{str(size[i] - 1)}:0" if big_endian[i] == "false" else f"0:{str(size[i] - 1)}"
-        buses += f'  <bus name=\"{var_names[i]}[{bus_range}]\" big_endian=\"{bus_endian}\">\n'
-        for j in range(size[i]):
-            buses += f'    <pin id=\"{j}\" name=\"{var_names[i]}_{j}_\"/>\n'
-        buses += '  </bus>\n'
+        if(size[i] > 1):
+            bus_endian = "false" if big_endian[i] == "false" else "true"
+            bus_range = f"{str(size[i] - 1)}:0" if big_endian[i] == "false" else f"0:{str(size[i] - 1)}"
+            buses += f'  <bus name=\"{var_names[i]}[{bus_range}]\" big_endian=\"{bus_endian}\">\n'
+            for j in range(size[i]):
+                buses += f'    <pin id=\"{j}\" name=\"{var_names[i]}_{j}_\"/>\n'
+            buses += '  </bus>\n'
     buses += '</bus_group>\n'
 
     with open('config/constraints/bus_group.xml', 'w') as f:
@@ -206,3 +208,45 @@ def flatten_constraints():
             f.write("".join(flattened_lines))
     except:
         pass
+
+
+def load_device_resources(layout="20x20"):
+    """
+    Load device resources from the resources.json file.
+    """
+    try:
+        resources_path = os.path.join(os.path.dirname(__file__), '../../yonga_archs/k4N8f_adder_BRAM_DSP/resources.json')
+        with open(resources_path, 'r') as f:
+            resources_data = json.load(f)
+        return resources_data.get(layout, {})
+    except Exception as e:
+        print(f"Error loading resources from JSON: {e}")
+        # Fallback to hardcoded values
+        quit()
+
+def generate_bitstream_c():
+    valid_words = []
+    line_mapping = []
+    with open ("fabric_bitstream.bit") as f:
+        for i, line in enumerate(f, start=1):
+            clean = line.split('//')[0].strip()
+            if clean:
+                valid_words.append(int(clean, 2))
+            line_mapping.append(str(i))
+
+    while len(valid_words) % 3 != 0:
+        valid_words.append(0)
+        line_mapping.append("pad")
+    with open("fabric_bitstream.h", "w") as f_out:
+        f_out.write("const uint32_t fabric_bitstream[] = {\n")
+        for i in range(0, len(valid_words), 3):
+            val = (valid_words[i+2] << 42 ) | ( valid_words[i+1] << 21 ) | valid_words[i]
+            upper = (val >> 32) & 0xFFFFFFFF
+            lower = val & 0xFFFFFFFF
+
+            lines = f"{line_mapping[i]}, {line_mapping[i+1]}, {line_mapping[i+2]}"
+
+            f_out.write(f"  0x{lower:08X}, // Lower 32 bits from lines: {lines}\n")
+            f_out.write(f"  0x{upper:08X}, // Upper 32 bits from lines: {lines}\n")
+        f_out.write("};\n\n")
+        f_out.write("const unsigned int fabric_bitstream_len = sizeof(fabric_bitstream) / sizeof(fabric_bitstream[0]);\n")
