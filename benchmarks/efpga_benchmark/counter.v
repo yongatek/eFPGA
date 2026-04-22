@@ -1,14 +1,3 @@
-// =============================================================================
-// Submodule : mode_test_benchmark
-// Purpose   : All benchmark logic – modes, header management, datapath, FSM
-// =============================================================================
-// Notes on Fanout Reduction:
-// Controls are explicitly duplicated 4 times to reduce fanout from ~128 to ~16.
-// Datapath registers (result, shreg, counter_r) are created as 4 explicit
-// 16-bit physical registers (e.g. result0, result1...) so that open-source
-// synthesis tools do not mangle arrays assigned from multiple always blocks.
-// =============================================================================
-
 module counter (
     input  wire        clk,
     input  wire        reset_n,
