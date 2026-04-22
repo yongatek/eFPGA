@@ -51,7 +51,6 @@ opt -undriven -fine -nodffe -nosdff
 proc
 ########################
 # Map multipliers
-# Inspired from synth_xilinx.cc
 #########################
 # Avoid merging any registers into DSP, reserve memory port registers first
 memory_dff
@@ -69,7 +68,6 @@ proc
 
 ########################
 # Map adders
-# Inspired from synth_xilinx.cc
 #########################
 # Avoid merging any registers into DSP, reserve memory port registers first
 techmap -map +/techmap.v -map ${YOSYS_ADDER_MAP_VERILOG}
