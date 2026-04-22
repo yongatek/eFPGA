@@ -5,9 +5,9 @@ module sfifo (clk, reset, w_en, r_en, data_in, data_out, full, empty);
   output [7:0] data_out;
   output full, empty;
   
-  reg [7:0] w_ptr, r_ptr;
+  reg [5:0] w_ptr, r_ptr;
   
-  reg [7:0] mem[255:0];
+  reg [7:0] mem[63:0];
   
   assign data_out = mem[r_ptr];
   

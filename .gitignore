@@ -9,5 +9,5 @@
 **/config/constraints/repack_design_constraints.xml
 **/yonga_archs/Fabric
 **/fpga_flow/processed_modules_index.txt
-**/__pychache
-**/__pychache/*
+**/__pycache
+**/__pycache/*

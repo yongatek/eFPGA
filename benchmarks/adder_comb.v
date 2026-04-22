@@ -1,28 +1,28 @@
 module adder_comb
 (
-   input [3:0] a_i,
-   input [3:0] b_i,
-   input [3:0] c_i,
-   input [3:0] d_i,
-   input [3:0] e_i,
-   input [3:0] f_i,
-   input [3:0] g_i,
-   input [3:0] h_i,
-   input [3:0] i_i,
-   input [3:0] j_i,
-   input [3:0] k_i,
-   input [3:0] l_i,
-   input [3:0] m_i,
-   input [3:0] n_i,
-   input [3:0] o_i,
-   input [3:0] p_i,
-   output [7:0] sum_o
+   input [0:0] a_i,
+   input [0:0] b_i,
+   input [0:0] c_i,
+   input [0:0] d_i,
+   input [0:0] e_i,
+   input [0:0] f_i,
+   input [0:0] g_i,
+   input [0:0] h_i,
+   input [0:0] i_i,
+   input [0:0] j_i,
+   input [0:0] k_i,
+   input [0:0] l_i,
+   input [0:0] m_i,
+   input [0:0] n_i,
+   input [0:0] o_i,
+   input [0:0] p_i,
+   output [4:0] sum_o
 );
 
-reg [4:0] ab,cd,ef,gh,ij,kl,mn,op;
-reg [5:0] sum1,sum2,sum3,sum4;
-reg [6:0] sum5, sum6;
-reg [7:0] sum7;
+reg [1:0] ab,cd,ef,gh,ij,kl,mn,op;
+reg [2:0] sum1,sum2,sum3,sum4;
+reg [3:0] sum5, sum6;
+reg [4:0] sum7;
 
 always @(*) begin
     
