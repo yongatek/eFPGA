@@ -78,6 +78,23 @@ eFPGA
     ├── efpga_ctrl.h
     └── eFPGA_regs.h
 ```
+## Toggle Coverage of Functional Tiles
+
+| Tile | Toggle Coverage (%) |
+| :--- | :--- |
+| tile_0__1_ | 80.7 |
+| tile_0__2_ | 97.54 |
+| tile_11__1_ | 85.89 |
+| tile_11__2_ | 99.51 |
+| tile_1__0_ | 96.30 |
+| tile_1__1_ | 88.8 |
+| tile_1__2_ | 99.82 |
+| tile_1__4_ | 99.77 |
+| tile_1__9_ | 99.82 |
+| tile_2__9_ | 99.82 |
+| tile_1__5_ | 99.83 |
+| tile_1__8_ | 99.93 |
+
 
 ## Requirements Status
 | Requirement ID | Requirement Description                                                                                            | Priority    | Category         | Current Status |
