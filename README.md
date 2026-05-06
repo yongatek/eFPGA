@@ -79,6 +79,7 @@ eFPGA
     └── eFPGA_regs.h
 ```
 ## Toggle Coverage of Functional Tiles
+The table below lists the toggle coverage for each functional tile, representing the percentage of nets and registers toggled during simulation.
 
 | Tile | Toggle Coverage (%) |
 | :--- | :--- |
@@ -94,7 +95,29 @@ eFPGA
 | tile_2__9_ | 99.82 |
 | tile_1__5_ | 99.83 |
 | tile_1__8_ | 99.93 |
+| **Average** | **95.64** |
 
+### Functional Coverage of Basic Logic Elements
+The following table summarizes the verified operational modes for the Basic Logic Elements (BLE). All defined configurations achieved full functional coverage.
+
+| CLB Mode | LUT Structure (A) | LUT Structure (B) | ADDER | Flip-Flop (A) | Flip-Flop (B) | Is it covered at least once? |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| LUT4 | | | | | | YES |
+| LUT4 | | | | FF | | YES |
+| LUT3 | | | | | | YES |
+| LUT3 | | | | | FF | YES |
+| LUT3 | | ADDER | | | | YES |
+| LUT3 | | ADDER | | FF | | YES |
+| | LUT3 | | | | | YES |
+| | LUT3 | | | | FF | YES |
+| | LUT3 | | ADDER | | | YES |
+| | LUT3 | | ADDER | | FF | YES |
+| LUT3 | LUT3 | | | | | YES |
+| LUT3 | LUT3 | | | FF | | YES |
+| LUT3 | LUT3 | | | | FF | YES |
+| LUT3 | LUT3 | | | FF | FF | YES |
+| LUT3 | LUT3 | | ADDER | | | YES |
+| LUT3 | LUT3 | | ADDER | FF | FF | YES |
 
 ## Requirements Status
 | Requirement ID | Requirement Description                                                                                            | Priority    | Category         | Current Status |
