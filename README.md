@@ -1,13 +1,15 @@
 # TRISTAN eFPGA v1.2.0
 TRISTAN eFPGA IP aims to provide an industrial-quality, open-source hardware building block for the RISC-V ecosystem. The proposed eFPGA architecture is highly customizable and can be used to implement various types of hardware accelerators and offload specific processor tasks.
 
-## Tested With
+## Getting Started
+
+### Tools
 This project has been tested with the following tool versions:
 - **Python** 3.7.9
 - **OpenFPGA** 1.2.3592
 - **Synopsys VCS** U-2023.03
 
-## OpenFPGA Installation
+### OpenFPGA Installation
 ```
 This repo supports both docker and standalone installations of OpenFPGA. 
 To use standalone installations, source openfpga.sh  from the OpenFPGA installation path before running the fpga_task.py script, 
@@ -78,7 +80,9 @@ eFPGA
     ├── efpga_ctrl.h
     └── eFPGA_regs.h
 ```
-## Toggle Coverage of Functional Tiles
+## Verification Results
+
+### Toggle Coverage of Functional Tiles
 The table below lists the toggle coverage for each functional tile, representing the percentage of nets and registers toggled during simulation.
 
 | Tile | Toggle Coverage (%) |
@@ -119,7 +123,7 @@ The following table summarizes the verified operational modes for the Basic Logi
 | LUT3 | LUT3 | | ADDER | | | YES |
 | LUT3 | LUT3 | | ADDER | FF | FF | YES |
 
-## Requirements Status
+### Requirements Traceability
 | Requirement ID | Requirement Description                                                                                            | Priority    | Category         | Current Status |
 |----------------|--------------------------------------------------------------------------------------------------------------------|-------------|------------------|----------------|
 | WI3.4.5-1      | eFPGA IP shall have single clock domain.                                                                           | Mandatory   | Functional       | Waived         |
