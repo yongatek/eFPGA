@@ -3,32 +3,7 @@ TRISTAN eFPGA IP aims to provide an industrial-quality, open-source hardware bui
 
 ## Getting Started
 
-### Tools
-This project has been tested with the following tool versions:
-- **Python** 3.7.9
-- **OpenFPGA** 1.2.3592
-- **Synopsys VCS** U-2023.03
-
-### OpenFPGA Installation
-```
-This repo supports both docker and standalone installations of OpenFPGA. 
-To use standalone installations, source openfpga.sh  from the OpenFPGA installation path before running the fpga_task.py script, 
-otherwise, the repo will default to a docker installation.
-```
-
-### Running OpenFPGA tasks
-OpenFPGA tasks are extensively automated through Python scripts. To utilize these scripts, run the script ```fpga_flow/fpga_task.py```, which provides the following options:
-```
-cd eFPGA/fpga_flow/
-python3 fpga_task.py 
-      0: Generates Fabric
-      1: Generates SDCs
-      2-4: Simulates Design
-      5: Generates bitstream
-```
-Please refer to [FPGA Flow README](fpga_flow/README.md) under the directory ```./fpga_flow``` for detailed information regarding the script.
-
-## Directory Hierarchy
+### Directory Hierarchy
 ```bash
 eFPGA
 │
@@ -80,6 +55,32 @@ eFPGA
     ├── efpga_ctrl.h
     └── eFPGA_regs.h
 ```
+
+### Tools
+This project has been tested with the following tool versions:
+- **Python** 3.7.9
+- **OpenFPGA** 1.2.3592
+- **Synopsys VCS** U-2023.03
+
+### OpenFPGA Installation
+```
+This repo supports both docker and standalone installations of OpenFPGA. 
+To use standalone installations, source openfpga.sh  from the OpenFPGA installation path before running the fpga_task.py script, 
+otherwise, the repo will default to a docker installation.
+```
+
+### Running OpenFPGA tasks
+OpenFPGA tasks are extensively automated through Python scripts. To utilize these scripts, run the script ```fpga_flow/fpga_task.py```, which provides the following options:
+```
+cd eFPGA/fpga_flow/
+python3 fpga_task.py 
+      0: Generates Fabric
+      1: Generates SDCs
+      2-4: Simulates Design
+      5: Generates bitstream
+```
+Please refer to [FPGA Flow README](fpga_flow/README.md) under the directory ```./fpga_flow``` for detailed information regarding the script.
+
 ## Verification Results
 
 ### Toggle Coverage of Functional Tiles
