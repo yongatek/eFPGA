@@ -1,5 +1,5 @@
 # TRISTAN eFPGA v1.2.0
-
+TRISTAN eFPGA IP aims to provide an industrial-quality, open-source hardware building block for the RISC-V ecosystem. The proposed eFPGA architecture is highly customizable and can be used to implement various types of hardware accelerators and offload specific processor tasks.
 
 ## Tested With
 This project has been tested with the following tool versions:
