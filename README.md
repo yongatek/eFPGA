@@ -138,3 +138,20 @@ The following table summarizes the verified operational modes for the Basic Logi
 | LUT3 | LUT3 | | | FF | FF | YES |
 | LUT3 | LUT3 | | ADDER | | | YES |
 | LUT3 | LUT3 | | ADDER | FF | FF | YES |
+
+## Benchmarks Results
+
+A select set of representative workloads mapped to the fabric to evaluate resource utilization across distinct application domains:
+
+| Domain | Benchmark | IO | CLB | DSP | BRAM |
+| :--- | :--- | :---: | :---: | :---: | :---: |
+| **DSP & Filters** | `bench_12_mult_32x32` | 130/143 | 36/188 | 9/20 | 0/10 |
+| | `bench_17_iir_filter_biquad` | 50/143 | 26/188 | 7/20 | 0/10 |
+| | `bench_16_fir_filter_4tap` | 50/143 | 20/188 | 4/20 | 0/10 |
+| **Memory Controllers** | `bench_30_memory_bank` | 24/143 | 130/188 | 0/20 | 0/10 |
+| | `ff_mem` | 94/143 | 82/188 | 3/20 | 8/10 |
+| | `bench_23_fifo_1k` | 22/143 | 80/188 | 0/20 | 0/10 |
+| **Computation / ALU** | `bench_19_alu_vector` | 100/143 | 28/188 | 0/20 | 0/10 |
+| | `bench_41_alu_pipeline` | 36/143 | 10/188 | 1/20 | 0/10 |
+| **Peripherals & FSM** | `bench_35_spi_master` | 15/143 | 6/188 | 0/20 | 0/10 |
+| | `bench_03_fsm_traffic` | 7/143 | 1/188 | 0/20 | 0/10 |
