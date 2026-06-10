@@ -139,7 +139,7 @@ The following table summarizes the verified operational modes for the Basic Logi
 | LUT3 | LUT3 | | ADDER | | | YES |
 | LUT3 | LUT3 | | ADDER | FF | FF | YES |
 
-## Benchmarks Results
+### Benchmarks Results
 
 A select set of workloads mapped to the fabric to evaluate resource utilization across different domains:
 
